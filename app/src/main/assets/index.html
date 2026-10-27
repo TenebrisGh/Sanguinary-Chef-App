@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanguinary Chef - Authentic Recipe Archives</title>
+    <style>
+        :root {
+            --blood-red: #8b0000;
+            --crimson: #d32f2f;
+            --gold: #ffd700;
+            --dark-gold: #c5a059;
+            --bg-dark: #0a0a0c;
+            --card-bg: rgba(26, 26, 32, 0.85);
+            --text-light: #f5f5f5;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(139, 0, 0, 0.35) 0%, transparent 60%),
+                radial-gradient(circle at 85% 30%, rgba(197, 160, 89, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 10% 80%, rgba(139, 0, 0, 0.2) 0%, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(180deg, rgba(60, 0, 0, 0.8) 0%, rgba(10, 10, 12, 0) 100%);
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+            padding: 3rem 1rem 2rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo { 
+            font-size: 3.5rem; 
+            margin-bottom: 0.5rem;
+            filter: drop-shadow(0 0 15px rgba(211, 47, 47, 0.6));
+        }
+
+        h1 {
+            color: var(--gold);
+            margin: 0;
+            font-size: 3rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.4), 2px 2px 4px #000;
+        }
+
+        .subtitle {
+            color: var(--dark-gold);
+            font-style: italic;
+            font-size: 1.15rem;
+            margin-top: 0.7rem;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 2rem auto 4rem;
+            padding: 0 1.5rem;
+        }
+
+        .controls-panel {
+            background: rgba(20, 20, 26, 0.75);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            padding: 1.8rem;
+            border-radius: 16px;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(139, 0, 0, 0.2);
+            backdrop-filter: blur(12px);
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .controls-panel { grid-template-columns: 1fr; }
+            h1 { font-size: 2rem; }
+        }
+
+        label {
+            color: var(--gold);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.6rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            background: rgba(12, 12, 16, 0.8);
+            border: 1px solid rgba(197, 160, 89, 0.4);
+            color: #fff;
+            font-size: 0.95rem;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            background: rgba(18, 18, 24, 0.95);
+        }
+
+        .stats-bar {
+            color: var(--dark-gold);
+            margin-bottom: 1.8rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .recipe-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            border-top: 4px solid var(--crimson);
+            border-radius: 14px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-7px);
+            border-color: var(--gold);
+            box-shadow: 0 15px 30px rgba(139, 0, 0, 0.4), 0 0 15px rgba(255, 215, 0, 0.2);
+        }
+
+        .card-header-banner {
+            background: linear-gradient(135deg, rgba(139, 0, 0, 0.6) 0%, rgba(20, 20, 26, 0.9) 100%);
+            padding: 1.2rem 1.4rem 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .recipe-card h3 {
+            color: var(--gold);
+            margin: 0;
+            font-size: 1.25rem;
+            line-height: 1.3;
+            font-weight: 700;
+        }
+
+        .cuisine-badge {
+            background: linear-gradient(135deg, #8b0000 0%, #b22222 100%);
+            color: #fff;
+            padding: 4px 10px;
+            font-size: 0.68rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            white-space: nowrap;
+            margin-left: 10px;
+        }
+
+        .recipe-content {
+            padding: 1.4rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .macro-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            background: rgba(10, 10, 14, 0.7);
+            border: 1px solid rgba(197, 160, 89, 0.2);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 1.2rem;
+            text-align: center;
+        }
+
+        .macro-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .macro-label {
+            font-size: 0.65rem;
+            color: var(--dark-gold);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .macro-value {
+            font-size: 0.9rem;
+            color: #fff;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .ingredients-title {
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 0.88rem;
+            border-bottom: 1px solid rgba(197, 160, 89, 0.2);
+            padding-bottom: 6px;
+            margin-bottom: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        ul {
+            padding-left: 1.2rem;
+            color: #d1d1d1;
+            margin: 0 0 1.5rem 0;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        ul li::marker {
+            color: var(--crimson);
+        }
+
+        .match-tag {
+            margin-top: auto;
+            background: rgba(139, 0, 0, 0.2);
+            border: 1px solid rgba(197, 160, 89, 0.4);
+            color: var(--gold);
+            padding: 8px;
+            text-align: center;
+            font-size: 0.82rem;
+            border-radius: 6px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">🩸⚔️</div>
+        <h1>Sanguinary Chef</h1>
+        <div class="subtitle">"By the Blood of Sanguinius, We Feast!" — 100 Authentic Recipes & Exact Macros</div>
+    </header>
+
+    <div class="container">
+        <div class="controls-panel">
+            <div>
+                <label for="cuisineSelect">Filter by Cuisine:</label>
+                <select id="cuisineSelect" onchange="filterRecipes()">
+                    <option value="ALL">All Cuisines (100 Recipes)</option>
+                    <option value="Italian">Italian Cuisine</option>
+                    <option value="Turkish">Turkish Cuisine</option>
+                    <option value="Japanese">Japanese Cuisine</option>
+                    <option value="Mexican">Mexican Cuisine</option>
+                    <option value="French">French Cuisine</option>
+                    <option value="Indian">Indian Cuisine</option>
+                    <option value="American">American Cuisine</option>
+                    <option value="Greek">Greek Cuisine</option>
+                    <option value="Spanish">Spanish Cuisine</option>
+                    <option value="Thai">Thai Cuisine</option>
+                </select>
+            </div>
+            <div>
+                <label for="nameSearch">Search Recipe Name:</label>
+                <input type="text" id="nameSearch" placeholder="Search dish name..." oninput="filterRecipes()">
+            </div>
+            <div>
+                <label for="ingredientSearch">Filter by Ingredients You Have:</label>
+                <input type="text" id="ingredientSearch" placeholder="e.g. garlic, tomato, beef..." oninput="filterRecipes()">
+            </div>
+        </div>
+
+        <div class="stats-bar" id="statsBar">Loading Archives...</div>
+
+        <div id="recipeResults" class="recipe-grid"></div>
+    </div>
+
+    <script>
+        const recipes = [
+            // ITALIAN (10)
+            { name: "Pizza Margherita", cuisine: "Italian", calories: 680, protein: "24g", carbs: "82g", fat: "28g", searchKeywords: ["flour", "tomato", "mozzarella", "basil", "olive oil"], ingredientsDetailed: ["250g Pizza Flour", "100g Tomato Sauce", "125g Fresh Mozzarella", "5 Fresh Basil Leaves", "15ml Extra Virgin Olive Oil"] },
+            { name: "Spaghetti alla Carbonara", cuisine: "Italian", calories: 750, protein: "32g", carbs: "78g", fat: "34g", searchKeywords: ["pasta", "egg", "guanciale", "pecorino cheese", "black pepper"], ingredientsDetailed: ["200g Spaghetti", "3 Large Egg Yolks", "100g Guanciale", "50g Pecorino Romano Cheese", "5g Black Pepper"] },
+            { name: "Lasagna alla Bolognese", cuisine: "Italian", calories: 820, protein: "42g", carbs: "65g", fat: "42g", searchKeywords: ["pasta", "ground beef", "tomato", "bechamel sauce", "cheese"], ingredientsDetailed: ["12 Lasagna Sheets", "300g Ground Beef", "200g Tomato Sauce", "150g Bechamel Sauce", "100g Mozzarella"] },
+            { name: "Risotto alla Milanese", cuisine: "Italian", calories: 540, protein: "12g", carbs: "68g", fat: "22g", searchKeywords: ["arborio rice", "saffron", "butter", "parmesan", "broth"], ingredientsDetailed: ["200g Arborio Rice", "0.5g Saffron Strands", "50g Butter", "40g Parmigiano-Reggiano", "750ml Chicken Broth"] },
+            { name: "Focaccia al Rosmarino", cuisine: "Italian", calories: 410, protein: "9g", carbs: "58g", fat: "16g", searchKeywords: ["flour", "olive oil", "rosemary", "sea salt", "yeast"], ingredientsDetailed: ["300g Bread Flour", "40ml Extra Virgin Olive Oil", "2 tbsp Fresh Rosemary", "1 tsp Sea Salt", "7g Dry Yeast"] },
+            { name: "Penne all'Arrabbiata", cuisine: "Italian", calories: 480, protein: "14g", carbs: "72g", fat: "14g", searchKeywords: ["penne pasta", "tomato", "garlic", "chili pepper", "olive oil"], ingredientsDetailed: ["200g Penne Pasta", "300g Canned Tomatoes", "3 Cloves Garlic", "1 tsp Red Chili Flakes", "20ml Olive Oil"] },
+            { name: "Ossobuco alla Milanese", cuisine: "Italian", calories: 690, protein: "54g", carbs: "16g", fat: "44g", searchKeywords: ["veal shank", "white wine", "carrots", "celery", "gremolata"], ingredientsDetailed: ["400g Veal Shanks", "150ml Dry White Wine", "1 Carrot", "1 Celery Stalk", "1 tbsp Gremolata"] },
+            { name: "Gnocchi al Sorrento", cuisine: "Italian", calories: 590, protein: "18g", carbs: "76g", fat: "24g", searchKeywords: ["potato gnocchi", "tomato sauce", "mozzarella", "basil"], ingredientsDetailed: ["300g Potato Gnocchi", "150g Tomato Sauce", "100g Mozzarella Cheese", "4 Fresh Basil Leaves"] },
+            { name: "Chicken Cacciatore", cuisine: "Italian", calories: 520, protein: "48g", carbs: "18g", fat: "28g", searchKeywords: ["chicken thigh", "bell pepper", "tomato", "olives", "wine"], ingredientsDetailed: ["300g Chicken Thighs", "1 Bell Pepper", "150g Crushed Tomatoes", "50g Black Olives", "100ml Red Wine"] },
+            { name: "Arancini di Riso", cuisine: "Italian", calories: 610, protein: "19g", carbs: "70g", fat: "27g", searchKeywords: ["rice", "breadcrumbs", "mozzarella", "ragu", "peas"], ingredientsDetailed: ["250g Cooked Risotto Rice", "50g Breadcrumbs", "60g Mozzarella", "80g Meat Ragu", "30g Green Peas"] },
+
+            // TURKISH (10)
+            { name: "Karnıyarık", cuisine: "Turkish", calories: 450, protein: "22g", carbs: "24g", fat: "30g", searchKeywords: ["eggplant", "ground beef", "onion", "tomato", "garlic"], ingredientsDetailed: ["2 Medium Eggplants", "200g Lean Ground Beef", "1 Medium Onion", "2 Tomatoes", "2 Cloves Garlic"] },
+            { name: "İskender Kebap", cuisine: "Turkish", calories: 910, protein: "52g", carbs: "68g", fat: "48g", searchKeywords: ["beef", "pita bread", "butter", "tomato sauce", "yogurt"], ingredientsDetailed: ["250g Thin Sliced Beef", "1 Cubed Pita Bread", "40g Melted Butter", "100g Tomato Sauce", "150g Whole Milk Yogurt"] },
+            { name: "Kayseri Mantısı", cuisine: "Turkish", calories: 620, protein: "28g", carbs: "75g", fat: "22g", searchKeywords: ["flour", "ground beef", "yogurt", "garlic", "chili butter"], ingredientsDetailed: ["200g Wheat Flour", "150g Minced Beef", "150g Garlic Yogurt", "20g Butter", "5g Red Pepper Flakes"] },
+            { name: "Hünkar Beğendi", cuisine: "Turkish", calories: 730, protein: "44g", carbs: "22g", fat: "52g", searchKeywords: ["lamb", "eggplant", "milk", "flour", "kashar cheese"], ingredientsDetailed: ["250g Lamb Cubes", "2 Roasted Eggplants", "200ml Milk", "25g Flour", "50g Kashar Cheese"] },
+            { name: "Adana Kebap", cuisine: "Turkish", calories: 680, protein: "46g", carbs: "12g", fat: "50g", searchKeywords: ["minced lamb", "tail fat", "red pepper", "sumac onion", "lavaş"], ingredientsDetailed: ["250g Minced Lamb", "30g Tail Fat", "1 Red Bell Pepper", "1 Sumac Onion", "1 Lavaş Flatbread"] },
+            { name: "Mercimek Çorbası", cuisine: "Turkish", calories: 290, protein: "16g", carbs: "42g", fat: "7g", searchKeywords: ["red lentils", "onion", "carrot", "cumin", "butter"], ingredientsDetailed: ["150g Red Lentils", "1 Small Onion", "1 Small Carrot", "1 tsp Cumin", "15g Butter"] },
+            { name: "İçli Köfte", cuisine: "Turkish", calories: 580, protein: "26g", carbs: "54g", fat: "28g", searchKeywords: ["bulgur", "ground beef", "walnuts", "onion", "spices"], ingredientsDetailed: ["150g Fine Bulgur", "200g Ground Beef", "40g Chopped Walnuts", "1 Onion", "1 tsp Mixed Spices"] },
+            { name: "Tavuk Sote", cuisine: "Turkish", calories: 420, protein: "48g", carbs: "14g", fat: "18g", searchKeywords: ["chicken breast", "tomato", "green pepper", "onion", "olive oil"], ingredientsDetailed: ["300g Chicken Breast", "2 Tomatoes", "2 Green Peppers", "1 Onion", "20ml Olive Oil"] },
+            { name: "Lahmacun", cuisine: "Turkish", calories: 510, protein: "24g", carbs: "62g", fat: "18g", searchKeywords: ["flour", "minced meat", "parsley", "onion", "tomato paste"], ingredientsDetailed: ["180g Flatbread Dough", "120g Minced Meat", "20g Fresh Parsley", "1 Onion", "15g Tomato Paste"] },
+            { name: "Zeytinyağlı Yaprak Sarması", cuisine: "Turkish", calories: 380, protein: "6g", carbs: "58g", fat: "14g", searchKeywords: ["grape leaves", "rice", "onion", "pine nuts", "currants", "olive oil"], ingredientsDetailed: ["20 Grape Leaves", "150g Rice", "2 Onions", "15g Pine Nuts", "15g Currants", "30ml Olive Oil"] },
+
+            // JAPANESE (10)
+            { name: "Tonkotsu Ramen", cuisine: "Japanese", calories: 780, protein: "38g", carbs: "80g", fat: "32g", searchKeywords: ["ramen noodles", "pork broth", "pork belly", "egg", "green onion"], ingredientsDetailed: ["180g Ramen Noodles", "400ml Rich Pork Broth", "100g Chashu Pork Belly", "1 Soft-boiled Egg", "20g Green Onions"] },
+            { name: "Chicken Teriyaki", cuisine: "Japanese", calories: 520, protein: "45g", carbs: "42g", fat: "18g", searchKeywords: ["chicken", "soy sauce", "mirin", "sugar", "ginger"], ingredientsDetailed: ["250g Chicken Thighs", "30ml Soy Sauce", "20ml Mirin", "15g Sugar", "5g Fresh Ginger"] },
+            { name: "Chicken Katsu Curry", cuisine: "Japanese", calories: 840, protein: "42g", carbs: "95g", fat: "30g", searchKeywords: ["chicken breast", "panko", "japanese curry block", "rice", "carrots"], ingredientsDetailed: ["200g Chicken Breast", "40g Panko Breadcrumbs", "1 Curry Roux Block", "200g Cooked Rice", "1 Carrot"] },
+            { name: "Salmon Nigiri & Roll Trio", cuisine: "Japanese", calories: 460, protein: "28g", carbs: "58g", fat: "12g", searchKeywords: ["sushi rice", "fresh salmon", "nori", "rice vinegar", "wasabi"], ingredientsDetailed: ["200g Sushi Rice", "120g Fresh Salmon", "2 Nori Sheets", "15ml Rice Vinegar", "5g Wasabi"] },
+            { name: "Beef Donburi (Gyudon)", cuisine: "Japanese", calories: 670, protein: "34g", carbs: "72g", fat: "26g", searchKeywords: ["thin sliced beef", "onion", "dashi", "soy sauce", "rice"], ingredientsDetailed: ["200g Thin Sliced Beef", "1 Medium Onion", "100ml Dashi Broth", "30ml Soy Sauce", "200g Steamed Rice"] },
+            { name: "Tempura Udong", cuisine: "Japanese", calories: 590, protein: "22g", carbs: "82g", fat: "18g", searchKeywords: ["udon noodles", "shrimp tempura", "dashi broth", "soy sauce", "scallions"], ingredientsDetailed: ["200g Udon Noodles", "3 Shrimp Tempura", "350ml Dashi Stock", "20ml Soy Sauce", "15g Scallions"] },
+            { name: "Yakitori Skewers", cuisine: "Japanese", calories: 430, protein: "44g", carbs: "16g", fat: "20g", searchKeywords: ["chicken thigh", "scallions", "tare sauce", "mirin", "soy sauce"], ingredientsDetailed: ["250g Chicken Thighs", "4 Scallion Stalks", "30ml Tare Sauce", "15ml Mirin", "15ml Soy Sauce"] },
+            { name: "Okonomiyaki", cuisine: "Japanese", calories: 610, protein: "26g", carbs: "64g", fat: "28g", searchKeywords: ["cabbage", "flour", "pork belly", "okonomiyaki sauce", "mayonnaise"], ingredientsDetailed: ["150g Shredded Cabbage", "100g Flour", "80g Pork Belly Slices", "30ml Okonomiyaki Sauce", "20g Japanese Mayo"] },
+            { name: "Unagi Don (Eel Bowl)", cuisine: "Japanese", calories: 710, protein: "32g", carbs: "78g", fat: "28g", searchKeywords: ["grilled eel", "unagi sauce", "steamed rice", "sansho pepper"], ingredientsDetailed: ["180g Grilled Freshwater Eel", "30ml Unagi Sauce", "220g Steamed Rice", "2g Sansho Pepper"] },
+            { name: "Miso Soup with Tofu", cuisine: "Japanese", calories: 180, protein: "12g", carbs: "14g", fat: "6g", searchKeywords: ["miso paste", "silken tofu", "wakame seaweed", "dashi stock"], ingredientsDetailed: ["30g Yellow Miso Paste", "100g Silken Tofu Cubes", "5g Dried Wakame Seaweed", "300ml Dashi Stock"] },
+
+            // MEXICAN (10)
+            { name: "Carne Asada Tacos", cuisine: "Mexican", calories: 580, protein: "34g", carbs: "48g", fat: "26g", searchKeywords: ["tortilla", "flank steak", "onion", "cilantro", "lime"], ingredientsDetailed: ["3 Corn Tortillas", "200g Marinated Flank Steak", "50g Chopped White Onion", "15g Fresh Cilantro", "1 Fresh Lime"] },
+            { name: "Chicken Enchiladas", cuisine: "Mexican", calories: 640, protein: "40g", carbs: "52g", fat: "28g", searchKeywords: ["tortilla", "chicken", "enchilada sauce", "cheese", "sour cream"], ingredientsDetailed: ["3 Corn Tortillas", "200g Shredded Chicken Breast", "120ml Red Enchilada Sauce", "80g Shredded Cheese", "30g Sour Cream"] },
+            { name: "Beef Burrito Supreme", cuisine: "Mexican", calories: 880, protein: "46g", carbs: "92g", fat: "36g", searchKeywords: ["flour tortilla", "ground beef", "black beans", "rice", "guacamole"], ingredientsDetailed: ["1 Large Flour Tortilla", "200g Seasoned Ground Beef", "80g Black Beans", "80g Mexican Rice", "50g Guacamole"] },
+            { name: "Chiles Rellenos", cuisine: "Mexican", calories: 530, protein: "22g", carbs: "32g", fat: "36g", searchKeywords: ["poblano pepper", "monterey jack cheese", "egg batter", "tomato caldillo"], ingredientsDetailed: ["2 Poblano Peppers", "120g Monterey Jack Cheese", "2 Eggs", "150ml Tomato Sauce"] },
+            { name: "Pork Carnitas Bowl", cuisine: "Mexican", calories: 720, protein: "48g", carbs: "54g", fat: "34g", searchKeywords: ["slow cooked pork", "cilantro lime rice", "pico de gallo", "black beans"], ingredientsDetailed: ["220g Slow Cooked Pork", "150g Cilantro Lime Rice", "60g Pico de Gallo", "80g Black Beans"] },
+            { name: "Chicken Quesadilla", cuisine: "Mexican", calories: 670, protein: "42g", carbs: "46g", fat: "34g", searchKeywords: ["flour tortilla", "chicken breast", "cheddar cheese", "salsa", "sour cream"], ingredientsDetailed: ["2 Flour Tortillas", "180g Grilled Chicken Breast", "100g Shredded Cheddar Cheese", "40g Salsa"] },
+            { name: "Birria de Res Tacos", cuisine: "Mexican", calories: 740, protein: "48g", carbs: "42g", fat: "42g", searchKeywords: ["braised beef shank", "corn tortilla", "consomme", "cheese", "cilantro"], ingredientsDetailed: ["200g Braised Beef Shank", "3 Corn Tortillas dipped in fat", "100ml Beef Consomme", "60g Oaxaca Cheese"] },
+            { name: "Tamales de Pollo", cuisine: "Mexican", calories: 490, protein: "24g", carbs: "52g", fat: "22g", searchKeywords: ["masa dough", "shredded chicken", "salsa verde", "corn husk"], ingredientsDetailed: ["150g Masa Harina Dough", "120g Shredded Chicken", "60ml Salsa Verde"] },
+            { name: "Tostadas de Camaron", cuisine: "Mexican", calories: 420, protein: "28g", carbs: "36g", fat: "18g", searchKeywords: ["crispy tostada", "shrimp", "avocado", "lime", "chipotle mayo"], ingredientsDetailed: ["2 Crispy Tostada Shells", "180g Cooked Shrimp", "1/2 Avocado", "15g Chipotle Mayo"] },
+            { name: "Chilaquiles Rojos", cuisine: "Mexican", calories: 560, protein: "20g", carbs: "62g", fat: "26g", searchKeywords: ["tortilla chips", "red salsa", "queso fresco", "fried egg", "crema"], ingredientsDetailed: ["120g Tortilla Chips", "150ml Red Salsa", "40g Queso Fresco", "1 Fried Egg", "20ml Mexican Crema"] },
+
+            // FRENCH (10)
+            { name: "Coq au Vin", cuisine: "French", calories: 690, protein: "48g", carbs: "18g", fat: "38g", searchKeywords: ["chicken", "red wine", "mushroom", "bacon", "garlic"], ingredientsDetailed: ["300g Chicken Legs", "250ml Burgundy Red Wine", "100g Button Mushrooms", "60g Bacon Lardons", "3 Cloves Garlic"] },
+            { name: "Ratatouille", cuisine: "French", calories: 280, protein: "6g", carbs: "26g", fat: "18g", searchKeywords: ["eggplant", "zucchini", "tomato", "bell pepper", "olive oil"], ingredientsDetailed: ["1 Eggplant", "2 Zucchinis", "3 Tomatoes", "1 Red Bell Pepper", "30ml Olive Oil"] },
+            { name: "Boeuf Bourguignon", cuisine: "French", calories: 780, protein: "52g", carbs: "22g", fat: "46g", searchKeywords: ["beef chuck", "red wine", "carrots", "pearl onions", "beef stock"], ingredientsDetailed: ["300g Beef Chuck", "300ml Pinot Noir", "2 Carrots", "8 Pearl Onions", "150ml Beef Stock"] },
+            { name: "French Onion Soup", cuisine: "French", calories: 420, protein: "18g", carbs: "38g", fat: "22g", searchKeywords: ["caramelized onions", "beef broth", "gruyere cheese", "baguette"], ingredientsDetailed: ["4 Large Yellow Onions", "400ml Beef Broth", "80g Gruyere Cheese", "2 Baguette Slices"] },
+            { name: "Duck Confit", cuisine: "French", calories: 820, protein: "44g", carbs: "8g", fat: "68g", searchKeywords: ["duck leg", "duck fat", "thyme", "garlic", "roasted potatoes"], ingredientsDetailed: ["2 Cured Duck Legs", "200g Duck Fat", "3 Sprigs Fresh Thyme", "150g Roasted Potatoes"] },
+            { name: "Quiche Lorraine", cuisine: "French", calories: 610, protein: "22g", carbs: "38g", fat: "42g", searchKeywords: ["pie crust", "bacon lardons", "eggs", "heavy cream", "swiss cheese"], ingredientsDetailed: ["1 Shortcrust Pastry", "120g Bacon Lardons", "3 Eggs", "150ml Heavy Cream", "60g Swiss Cheese"] },
+            { name: "Bouillabaisse", cuisine: "French", calories: 540, protein: "56g", carbs: "20g", fat: "24g", searchKeywords: ["white fish", "mussels", "saffron", "fennel", "tomato broth"], ingredientsDetailed: ["250g Mixed White Fish", "150g Mussels", "0.5g Saffron", "1 Fennel Bulb", "200ml Tomato Broth"] },
+            { name: "Sole Meunière", cuisine: "French", calories: 460, protein: "38g", carbs: "12g", fat: "28g", searchKeywords: ["sole fillet", "flour", "butter", "lemon", "parsley"], ingredientsDetailed: ["250g Sole Fillet", "30g Flour", "40g French Butter", "1 Lemon", "10g Chopped Parsley"] },
+            { name: "Cassoulet", cuisine: "French", calories: 890, protein: "58g", carbs: "62g", fat: "48g", searchKeywords: ["white beans", "duck confit", "pork sausage", "garlic", "breadcrumbs"], ingredientsDetailed: ["200g White Beans", "1 Duck Confit Leg", "100g Pork Sausage", "2 Cloves Garlic", "30g Breadcrumbs"] },
+            { name: "Steak Frites", cuisine: "French", calories: 790, protein: "50g", carbs: "52g", fat: "42g", searchKeywords: ["ribeye steak", "french fries", "compound butter", "black pepper"], ingredientsDetailed: ["250g Ribeye Steak", "200g French Fries", "30g Herb Compound Butter", "5g Cracked Pepper"] },
+
+            // INDIAN (10)
+            { name: "Chicken Butter Masala", cuisine: "Indian", calories: 720, protein: "42g", carbs: "22g", fat: "52g", searchKeywords: ["chicken", "tomato sauce", "butter", "heavy cream", "garam masala"], ingredientsDetailed: ["250g Chicken Thighs", "150g Tomato Puree", "40g Butter", "60ml Heavy Cream", "10g Garam Masala"] },
+            { name: "Chana Masala", cuisine: "Indian", calories: 410, protein: "18g", carbs: "62g", fat: "12g", searchKeywords: ["chickpeas", "onion", "tomato", "ginger", "garlic", "spices"], ingredientsDetailed: ["400g Cooked Chickpeas", "1 Large Onion", "2 Tomatoes", "10g Fresh Ginger", "3 Cloves Garlic"] },
+            { name: "Chicken Tikka Masala", cuisine: "Indian", calories: 680, protein: "44g", carbs: "24g", fat: "46g", searchKeywords: ["marinated chicken", "spiced curry sauce", "yogurt", "garam masala"], ingredientsDetailed: ["250g Chicken Breast", "150g Yogurt Marinade", "200ml Spiced Tomato Sauce", "10g Garam Masala"] },
+            { name: "Lamb Vindaloo", cuisine: "Indian", calories: 740, protein: "46g", carbs: "18g", fat: "52g", searchKeywords: ["lamb shoulder", "vinegar", "red chili paste", "potatoes", "spices"], ingredientsDetailed: ["250g Lamb Shoulder", "30ml Vinegar", "2 tbsp Red Chili Paste", "1 Potato", "1 tbsp Kashmiri Spices"] },
+            { name: "Palak Paneer", cuisine: "Indian", calories: 510, protein: "24g", carbs: "16g", fat: "38g", searchKeywords: ["spinach", "paneer cheese", "cream", "garlic", "cumin"], ingredientsDetailed: ["300g Fresh Spinach", "150g Paneer Cheese Cubes", "40ml Heavy Cream", "3 Cloves Garlic", "1 tsp Cumin"] },
+            { name: "Rogan Josh", cuisine: "Indian", calories: 690, protein: "48g", carbs: "14g", fat: "48g", searchKeywords: ["mutton", "yogurt", "kanchmiri chili", "cardamom", "ghee"], ingredientsDetailed: ["250g Mutton Cubes", "100g Plain Yogurt", "2 tbsp Kashmiri Chili Powder", "4 Cardamom Pods", "30g Ghee"] },
+            { name: "Dal Makhani", cuisine: "Indian", calories: 480, protein: "18g", carbs: "52g", fat: "22g", searchKeywords: ["black lentils", "kidney beans", "butter", "cream", "tomato puree"], ingredientsDetailed: ["150g Black Lentils", "50g Kidney Beans", "30g Butter", "40ml Cream", "100g Tomato Puree"] },
+            { name: "Biryani Hydrabadi", cuisine: "Indian", calories: 810, protein: "42g", carbs: "88g", fat: "32g", searchKeywords: ["basmati rice", "marinated chicken", "saffron", "fried onions", "mint"], ingredientsDetailed: ["200g Basmati Rice", "220g Chicken Thighs", "0.2g Saffron", "40g Crispy Fried Onions", "15g Fresh Mint"] },
+            { name: "Aloo Gobi", cuisine: "Indian", calories: 320, protein: "9g", carbs: "48g", fat: "11g", searchKeywords: ["potatoes", "cauliflower", "turmeric", "cumin", "coriander"], ingredientsDetailed: ["200g Potatoes", "200g Cauliflower Florets", "1 tsp Turmeric", "1 tsp Cumin Seeds", "10g Fresh Coriander"] },
+            { name: "Samosa Potato & Pea", cuisine: "Indian", calories: 450, protein: "10g", carbs: "58g", fat: "20g", searchKeywords: ["flour pastry", "spiced potato", "green peas", "coriander", "oil"], ingredientsDetailed: ["150g Pastry Dough", "180g Boiled Potatoes", "50g Green Peas", "1 tsp Mixed Masala Spices"] },
+
+            // AMERICAN (10)
+            { name: "Classic Cheeseburger", cuisine: "American", calories: 780, protein: "42g", carbs: "48g", fat: "44g", searchKeywords: ["ground beef patty", "cheddar cheese", "brioche bun", "pickle", "sauce"], ingredientsDetailed: ["200g Ground Beef Patty", "2 Slices Cheddar Cheese", "1 Brioche Bun", "2 Pickle Slices", "20g House Sauce"] },
+            { name: "BBQ Pork Ribs", cuisine: "American", calories: 920, protein: "54g", carbs: "42g", fat: "58g", searchKeywords: ["pork ribs", "bbq sauce", "brown sugar", "paprika", "apple cider vinegar"], ingredientsDetailed: ["400g Pork Baby Back Ribs", "100ml Smokey BBQ Sauce", "20g Brown Sugar", "1 tbsp Smoked Paprika"] },
+            { name: "Macaroni and Cheese", cuisine: "American", calories: 690, protein: "26g", carbs: "68g", fat: "36g", searchKeywords: ["macaroni pasta", "cheddar cheese", "gruyere", "milk", "butter"], ingredientsDetailed: ["200g Elbow Macaroni", "120g Sharp Cheddar", "60g Gruyere", "150ml Whole Milk", "30g Butter"] },
+            { name: "New England Clam Chowder", cuisine: "American", calories: 540, protein: "22g", carbs: "42g", fat: "32g", searchKeywords: ["clams", "potatoes", "heavy cream", "bacon", "celery"], ingredientsDetailed: ["180g Clam Meat", "2 Potatoes", "150ml Heavy Cream", "40g Diced Bacon", "1 Celery Stalk"] },
+            { name: "Buffalo Chicken Wings", cuisine: "American", calories: 710, protein: "48g", carbs: "8g", fat: "54g", searchKeywords: ["chicken wings", "frank hot sauce", "butter", "blue cheese dip"], ingredientsDetailed: ["400g Chicken Wings", "80ml Hot Sauce", "40g Butter", "50g Blue Cheese Dressing"] },
+            { name: "Philly Cheesesteak", cuisine: "American", calories: 830, protein: "52g", carbs: "56g", fat: "44g", searchKeywords: ["ribeye steak", "provolone cheese", "hoagie roll", "onions", "peppers"], ingredientsDetailed: ["220g Thin Ribeye Slices", "3 Slices Provolone Cheese", "1 Hoagie Roll", "1 Diced Onion"] },
+            { name: "Southern Fried Chicken", cuisine: "American", calories: 860, protein: "58g", carbs: "42g", fat: "50g", searchKeywords: ["chicken thighs", "buttermilk", "flour", "paprika", "garlic powder"], ingredientsDetailed: ["300g Chicken Thighs", "200ml Buttermilk", "100g Seasoned Flour", "1 tsp Garlic Powder"] },
+            { name: "Cajun Jambalaya", cuisine: "American", calories: 740, protein: "46g", carbs: "68g", fat: "30g", searchKeywords: ["andouille sausage", "chicken", "shrimp", "rice", "cajun spices"], ingredientsDetailed: ["100g Andouille Sausage", "150g Chicken Thigh", "100g Shrimp", "180g Long Grain Rice"] },
+            { name: "Maryland Crab Cakes", cuisine: "American", calories: 480, protein: "38g", carbs: "18g", fat: "28g", searchKeywords: ["lump crab meat", "panko breadcrumbs", "old bay seasoning", "mayo", "mustard"], ingredientsDetailed: ["250g Lump Crab Meat", "30g Panko Breadcrumbs", "1 tsp Old Bay Seasoning", "20g Mayonnaise"] },
+            { name: "Texas Beef Brisket", cuisine: "American", calories: 890, protein: "62g", carbs: "12g", fat: "66g", searchKeywords: ["smoked beef brisket", "black pepper rub", "kosher salt", "wood smoke"], ingredientsDetailed: ["350g Smoked Beef Brisket", "1 tbsp Coarse Black Pepper", "1 tsp Kosher Salt"] },
+
+            // GREEK (10)
+            { name: "Moussaka", cuisine: "Greek", calories: 720, protein: "34g", carbs: "42g", fat: "44g", searchKeywords: ["eggplant", "minced lamb", "bechamel sauce", "potatoes", "cinnamon"], ingredientsDetailed: ["2 Eggplants", "250g Minced Lamb", "150ml Bechamel Sauce", "1 Large Potato", "1/2 tsp Cinnamon"] },
+            { name: "Souvlaki Pork Skewers", cuisine: "Greek", calories: 580, protein: "46g", carbs: "32g", fat: "28g", searchKeywords: ["pork neck", "pita bread", "tzatziki sauce", "oregano", "lemon"], ingredientsDetailed: ["250g Pork Neck Cubes", "1 Greek Pita", "60g Tzatziki Sauce", "1 tbsp Dried Oregano"] },
+            { name: "Greek Salad (Horiatiki)", cuisine: "Greek", calories: 390, protein: "12g", carbs: "18g", fat: "30g", searchKeywords: ["feta cheese", "kalamata olives", "cucumbers", "tomatoes", "olive oil"], ingredientsDetailed: ["150g Feta Cheese", "50g Kalamata Olives", "1 Cucumber", "2 Tomatoes", "35ml Extra Virgin Olive Oil"] },
+            { name: "Spanakopita", cuisine: "Greek", calories: 510, protein: "16g", carbs: "44g", fat: "30g", searchKeywords: ["phyllo pastry", "spinach", "feta cheese", "dill", "butter"], ingredientsDetailed: ["8 Phyllo Sheets", "250g Fresh Spinach", "120g Feta Cheese", "15g Fresh Dill", "40g Melted Butter"] },
+            { name: "Gyros Plate", cuisine: "Greek", calories: 820, protein: "48g", carbs: "58g", fat: "44g", searchKeywords: ["seasoned pork gyros", "french fries", "tzatziki", "pita", "red onion"], ingredientsDetailed: ["250g Pork Gyros", "150g French Fries", "80g Tzatziki Sauce", "1 Greek Pita"] },
+            { name: "Pastitsio", cuisine: "Greek", calories: 760, protein: "38g", carbs: "68g", fat: "36g", searchKeywords: ["tubular pasta", "ground beef", "bechamel sauce", "kefalotyri cheese"], ingredientsDetailed: ["200g Penne/Buca pasta", "250g Ground Beef", "200ml Bechamel", "50g Grated Kefalotyri Cheese"] },
+            { name: "Kleftiko Lamb", cuisine: "Greek", calories: 810, protein: "54g", carbs: "28g", fat: "54g", searchKeywords: ["slow roasted lamb", "potatoes", "garlic", "oregano", "lemon juice"], ingredientsDetailed: ["300g Lamb Leg on Bone", "2 Potatoes", "4 Cloves Garlic", "20ml Fresh Lemon Juice"] },
+            { name: "Garides Saganaki", cuisine: "Greek", calories: 460, protein: "34g", carbs: "16g", fat: "28g", searchKeywords: ["shrimp", "feta cheese", "ouzo", "tomato sauce", "garlic"], ingredientsDetailed: ["220g Large Shrimp", "100g Feta Cheese", "30ml Ouzo", "150g Tomato Sauce"] },
+            { name: "Stifado Beef Stew", cuisine: "Greek", calories: 680, protein: "48g", carbs: "24g", fat: "42g", searchKeywords: ["beef stew", "shallots", "red wine", "cinnamon", "cloves"], ingredientsDetailed: ["280g Beef Stew Cubes", "200g Small Shallots", "150ml Red Wine", "1 Cinnamon Stick"] },
+            { name: "Fasolada Bean Soup", cuisine: "Greek", calories: 360, protein: "16g", carbs: "52g", fat: "10g", searchKeywords: ["white navy beans", "celery", "carrots", "olive oil", "tomato paste"], ingredientsDetailed: ["180g Dried White Beans", "2 Celery Stalks", "2 Carrots", "30ml Olive Oil", "20g Tomato Paste"] },
+
+            // SPANISH (10)
+            { name: "Paella Valenciana", cuisine: "Spanish", calories: 740, protein: "44g", carbs: "82g", fat: "26g", searchKeywords: ["bomba rice", "chicken", "rabbit", "saffron", "green beans"], ingredientsDetailed: ["200g Bomba Rice", "150g Chicken", "100g Rabbit", "0.3g Saffron", "60g Green Beans"] },
+            { name: "Gazpacho Andaluz", cuisine: "Spanish", calories: 210, protein: "4g", carbs: "18g", fat: "14g", searchKeywords: ["ripe tomatoes", "cucumber", "bell pepper", "olive oil", "sherry vinegar"], ingredientsDetailed: ["500g Ripe Tomatoes", "1 Cucumber", "1/2 Green Pepper", "30ml EV Olive Oil", "15ml Sherry Vinegar"] },
+            { name: "Tortilla de Patatas", cuisine: "Spanish", calories: 520, protein: "18g", carbs: "42g", fat: "32g", searchKeywords: ["potatoes", "eggs", "onions", "olive oil", "salt"], ingredientsDetailed: ["3 Large Potatoes", "5 Large Eggs", "1 Yellow Onion", "100ml Olive Oil for frying"] },
+            { name: "Patatas Bravas", cuisine: "Spanish", calories: 430, protein: "6g", carbs: "54g", fat: "22g", searchKeywords: ["fried potato cubes", "spicy brava sauce", "alioli", "smoked paprika"], ingredientsDetailed: ["250g Fried Potato Cubes", "50ml Spicy Brava Sauce", "30ml Garlic Alioli"] },
+            { name: "Gambas al Ajillo", cuisine: "Spanish", calories: 410, protein: "32g", carbs: "4g", fat: "30g", searchKeywords: ["shrimp", "garlic slices", "olive oil", "chili pepper", "parsley"], ingredientsDetailed: ["200g Fresh Shrimp", "6 Cloves Garlic Slices", "50ml Olive Oil", "1 Dried Red Chili"] },
+            { name: "Pollo al Chilindrón", cuisine: "Spanish", calories: 580, protein: "46g", carbs: "16g", fat: "36g", searchKeywords: ["chicken thighs", "red bell pepper", "jamon serrano", "tomatoes", "garlic"], ingredientsDetailed: ["300g Chicken Thighs", "1 Red Bell Pepper", "40g Diced Serrano Ham", "150g Crushed Tomatoes"] },
+            { name: "Albondigas en Salsa", cuisine: "Spanish", calories: 620, protein: "36g", carbs: "22g", fat: "42g", searchKeywords: ["pork and beef meatballs", "rich tomato sauce", "white wine", "garlic"], ingredientsDetailed: ["250g Pork/Beef Meatballs", "180ml Rich Tomato Sauce", "50ml White Wine"] },
+            { name: "Pulpo a la Gallega", cuisine: "Spanish", calories: 390, protein: "42g", carbs: "18g", fat: "16g", searchKeywords: ["boiled octopus", "sliced potatoes", "sweet smoked paprika", "olive oil"], ingredientsDetailed: ["200g Boiled Octopus Tentacles", "1 Boiled Potato Sliced", "1 tbsp Smoked Paprika"] },
+            { name: "Fabada Asturiana", cuisine: "Spanish", calories: 860, protein: "48g", carbs: "56g", fat: "50g", searchKeywords: ["large white beans", "chorizo", "morcilla blood sausage", "pork shoulder"], ingredientsDetailed: ["200g Asturian Fabes Beans", "1 Chorizo Sausage", "1 Morcilla Sausage", "100g Pork Shoulder"] },
+            { name: "Croquetas de Jamón", cuisine: "Spanish", calories: 490, protein: "16g", carbs: "38g", fat: "30g", searchKeywords: ["bechamel", "jamon serrano", "breadcrumbs", "egg coating"], ingredientsDetailed: ["180g Thick Bechamel", "60g Diced Serrano Ham", "40g Breadcrumbs", "1 Egg"] },
+
+            // THAI (10)
+            { name: "Pad Thai Shrimp", cuisine: "Thai", calories: 650, protein: "32g", carbs: "84g", fat: "20g", searchKeywords: ["rice noodles", "shrimp", "tamarind paste", "peanuts", "bean sprouts"], ingredientsDetailed: ["180g Rice Noodles", "150g Shrimp", "30ml Tamarind Paste", "30g Crushed Peanuts", "50g Bean Sprouts"] },
+            { name: "Tom Yum Goong", cuisine: "Thai", calories: 320, protein: "26g", carbs: "14g", fat: "18g", searchKeywords: ["shrimp", "lemongrass", "galangal", "kaffir lime leaves", "chili paste"], ingredientsDetailed: ["180g Shrimp", "2 Lemongrass Stalks", "15g Galangal", "4 Kaffir Lime Leaves", "1 tbsp Thai Chili Paste"] },
+            { name: "Green Chicken Curry", cuisine: "Thai", calories: 680, protein: "42g", carbs: "20g", fat: "48g", searchKeywords: ["chicken thigh", "green curry paste", "coconut milk", "thai basil", "bamboo shoots"], ingredientsDetailed: ["250g Chicken Thighs", "2 tbsp Green Curry Paste", "250ml Coconut Milk", "15g Thai Basil", "50g Bamboo Shoots"] },
+            { name: "Massaman Beef Curry", cuisine: "Thai", calories: 790, protein: "46g", carbs: "32g", fat: "54g", searchKeywords: ["beef chuck", "massaman paste", "coconut cream", "potatoes", "peanuts"], ingredientsDetailed: ["250g Beef Chuck", "2 tbsp Massaman Paste", "200ml Coconut Cream", "1 Potato", "30g Roasted Peanuts"] },
+            { name: "Pad Kra Pao (Basil Pork)", cuisine: "Thai", calories: 580, protein: "38g", carbs: "44g", fat: "28g", searchKeywords: ["minced pork", "holy basil", "bird eye chili", "fried egg", "jasmine rice"], ingredientsDetailed: ["200g Minced Pork", "20g Fresh Holy Basil", "3 Bird's Eye Chilis", "1 Crispy Fried Egg", "180g Jasmine Rice"] },
+            { name: "Som Tum (Papaya Salad)", cuisine: "Thai", calories: 240, protein: "6g", carbs: "38g", fat: "8g", searchKeywords: ["green papaya", "fish sauce", "lime juice", "peanuts", "cherry tomatoes"], ingredientsDetailed: ["200g Shredded Green Papaya", "20ml Fish Sauce", "25ml Lime Juice", "25g Peanuts", "4 Cherry Tomatoes"] },
+            { name: "Khao Soi Northern Noodles", cuisine: "Thai", calories: 720, protein: "36g", carbs: "68g", fat: "34g", searchKeywords: ["egg noodles", "chicken drumstick", "coconut curry broth", "crispy noodles"], ingredientsDetailed: ["150g Egg Noodles", "2 Chicken Drumsticks", "250ml Coconut Curry Broth", "30g Deep Fried Noodles"] },
+            { name: "Panang Chicken Curry", cuisine: "Thai", calories: 640, protein: "40g", carbs: "18g", fat: "46g", searchKeywords: ["chicken breast", "panang curry paste", "thick coconut cream", "kaffir lime"], ingredientsDetailed: ["220g Chicken Breast", "2 tbsp Panang Paste", "200ml Thick Coconut Cream", "3 Kaffir Lime Leaves"] },
+            { name: "Thai Fried Rice (Khao Pad)", cuisine: "Thai", calories: 590, protein: "24g", carbs: "76g", fat: "20g", searchKeywords: ["jasmine rice", "egg", "crab meat or chicken", "soy sauce", "cucumber slices"], ingredientsDetailed: ["220g Jasmine Rice", "2 Eggs", "100g Crab Meat", "15ml Light Soy Sauce", "4 Cucumber Slices"] },
+            { name: "Larb Gai (Chicken Salad)", cuisine: "Thai", calories: 380, protein: "42g", carbs: "16g", fat: "16g", searchKeywords: ["minced chicken", "toasted rice powder", "mint", "lime juice", "shallots"], ingredientsDetailed: ["250g Minced Chicken", "1 tbsp Toasted Rice Powder", "15g Fresh Mint Leaves", "30ml Lime Juice", "2 Shallots"] }
+        ];
+
+        function filterRecipes() {
+            const selectedCuisine = document.getElementById("cuisineSelect").value;
+            const nameInput = document.getElementById("nameSearch").value.toLowerCase().trim();
+            const ingredientInput = document.getElementById("ingredientSearch").value.toLowerCase().trim();
+            const userIngredients = ingredientInput ? ingredientInput.split(",").map(i => i.trim()).filter(i => i !== "") : [];
+            
+            const container = document.getElementById("recipeResults");
+            const statsBar = document.getElementById("statsBar");
+
+            container.innerHTML = "";
+
+            const filtered = recipes.filter(recipe => {
+                const matchesCuisine = (selectedCuisine === "ALL" || recipe.cuisine === selectedCuisine);
+                const matchesName = !nameInput || recipe.name.toLowerCase().includes(nameInput);
+                const matchesIngredients = userIngredients.length === 0 || userIngredients.some(ing => recipe.searchKeywords.some(k => k.includes(ing)));
+                
+                return matchesCuisine && matchesName && matchesIngredients;
+            });
+
+            statsBar.innerText = `Showing ${filtered.length} of ${recipes.length} Authentic Recipes`;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<p style="color: var(--crimson); font-size: 1.2rem; grid-column: 1/-1; text-align: center; padding: 3rem;">No sacred recipes matched your criteria in the Chapter Archives.</p>`;
+                return;
+            }
+
+            filtered.forEach(recipe => {
+                const matchedCount = userIngredients.length > 0 
+                    ? recipe.searchKeywords.filter(ing => userIngredients.some(u => ing.includes(u))).length 
+                    : recipe.searchKeywords.length;
+
+                const card = document.createElement("div");
+                card.className = "recipe-card";
+                card.innerHTML = `
+                    <div class="card-header-banner">
+                        <h3>${recipe.name}</h3>
+                        <span class="cuisine-badge">${recipe.cuisine}</span>
+                    </div>
+                    <div class="recipe-content">
+                        <div class="macro-container">
+                            <div class="macro-box">
+                                <span class="macro-label">Calories</span>
+                                <span class="macro-value">${recipe.calories}</span>
+                            </div>
+                            <div class="macro-box">
+                                <span class="macro-label">Protein</span>
+                                <span class="macro-value">${recipe.protein}</span>
+                            </div>
+                            <div class="macro-box">
+                                <span class="macro-label">Carbs</span>
+                                <span class="macro-value">${recipe.carbs}</span>
+                            </div>
+                            <div class="macro-box">
+                                <span class="macro-label">Fat</span>
+                                <span class="macro-value">${recipe.fat}</span>
+                            </div>
+                        </div>
+
+                        <div class="ingredients-title">Exact Ingredients & Measurements</div>
+                        <ul>
+                            ${recipe.ingredientsDetailed.map(ing => `<li>${ing}</li>`).join("")}
+                        </ul>
+                        <div class="match-tag">${userIngredients.length > 0 ? `Matches ${matchedCount} ingredient(s)` : 'Sacred Recipe'}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        filterRecipes();
+    </script>
+</body>
+</html>
