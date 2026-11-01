@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sanguinary Feast - Kitchen Management Game</title>
+    <title>Sanguinary Chef - Real Recipe Challenge</title>
     <style>
         :root {
             --bg-color: #0a0a0c;
@@ -98,7 +98,7 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             margin-bottom: 15px;
         }
 
@@ -106,9 +106,9 @@
             background-color: #22222a;
             color: var(--text-color);
             border: 1px solid var(--primary-red);
-            padding: 10px 15px;
+            padding: 10px 14px;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -166,8 +166,8 @@
 <body>
 
     <header>
-        <h1>Sanguinary Feast</h1>
-        <div class="subtitle">Gothic Kitchen & Banquet Challenge</div>
+        <h1>Sanguinary Chef</h1>
+        <div class="subtitle">Gothic Gastronomy - Real Recipe Challenge</div>
     </header>
 
     <div class="stats-board">
@@ -200,17 +200,32 @@
     <div id="feedback"></div>
 
     <script>
+        // Real Culinary Recipes with Gothic Themed Names
         const recipes = [
-            { name: "Sanguine Tartare", required: ["Raw Beef", "Blood Drop", "Black Pepper"] },
-            { name: "Blackened Angel Wings", required: ["Poultry", "Dark Spice", "Fire Sauce"] },
-            { name: "Vykosa's Blood Wine", required: ["Red Grapes", "Blood Drop", "Gothic Elixir"] },
-            { name: "Cerberus Stew", required: ["Venison", "Dark Spice", "Blood Drop"] }
+            { 
+                name: "Sanguine Steak Tartare", 
+                required: ["Beef Tenderloin", "Egg Yolk", "Capers", "Dijon Mustard"] 
+            },
+            { 
+                name: "Blackened Angel Wings", 
+                required: ["Chicken Wings", "Smoked Paprika", "Cayenne Pepper", "Garlic Powder"] 
+            },
+            { 
+                name: "Blood Orange Sangria", 
+                required: ["Red Wine", "Blood Orange Juice", "Cinnamon", "Brandy"] 
+            },
+            { 
+                name: "Gothic Truffle Risotto", 
+                required: ["Arborio Rice", "Black Truffle", "Parmesan Cheese", "Chicken Stock"] 
+            }
         ];
 
+        // Combined Real Ingredients Pool
         const allIngredients = [
-            "Raw Beef", "Blood Drop", "Black Pepper", 
-            "Poultry", "Dark Spice", "Fire Sauce", 
-            "Red Grapes", "Gothic Elixir", "Venison"
+            "Beef Tenderloin", "Egg Yolk", "Capers", "Dijon Mustard",
+            "Chicken Wings", "Smoked Paprika", "Cayenne Pepper", "Garlic Powder",
+            "Red Wine", "Blood Orange Juice", "Cinnamon", "Brandy",
+            "Arborio Rice", "Black Truffle", "Parmesan Cheese", "Chicken Stock"
         ];
 
         let currentRecipe = {};
@@ -236,7 +251,7 @@
                 document.getElementById("timer").innerText = timeLeft + "s";
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    alert("Game Over! Your Final Score: " + score);
+                    alert("Time's Up! Your Final Banquet Score: " + score);
                     initGame();
                 }
             }, 1000);
@@ -287,11 +302,11 @@
             if (isCorrect) {
                 score += 10;
                 feedback.style.color = "#00ff00";
-                feedback.innerText = "+10 Perfect Dish Servicing!";
+                feedback.innerText = "+10 Perfect Recipe Prepared!";
             } else {
                 score = Math.max(0, score - 5);
                 feedback.style.color = "#ff3333";
-                feedback.innerText = "-5 Wrong Ingredients!";
+                feedback.innerText = "-5 Ruined Dish!";
             }
 
             document.getElementById("score").innerText = score;
