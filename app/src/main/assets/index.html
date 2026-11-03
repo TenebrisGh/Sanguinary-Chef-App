@@ -199,6 +199,79 @@ function rr(x,y,w,h,r,fill,stroke=null,lw=2){ctx.beginPath();ctx.roundRect(x,y,w
 function line(x1,y1,x2,y2,color,width=2){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke()}
 function text(str,x,y,size,color="#4b3829",font="700 16px DM Sans",align="center"){ctx.font=font;ctx.fillStyle=color;ctx.textAlign=align;ctx.fillText(str,x,y)}
 function ellipse(x,y,rx,ry,fill,stroke=null){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke()}}
+
+// --- GELİŞMİŞ 2D MODEL KARAKTER ÇİZİM FONKSİYONU ---
+function drawModelCharacter(x, y, shirtColor, hairColor, scale = 1) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+
+    // Gölge
+    ellipse(0, 22, 18, 7, "#2c1e1444");
+
+    // Gövde (Kıyafet)
+    rr(-14, 2, 28, 22, 8, shirtColor, "#3d281a", 2);
+
+    // Kollar
+    rr(-21, 6, 8, 16, 4, shirtColor, "#3d281a", 2);
+    rr(13, 6, 8, 16, 4, shirtColor, "#3d281a", 2);
+
+    // Kafa (Ten Rengi)
+    ellipse(0, -10, 11, 13, "#f3cab3", "#3d281a", 2);
+
+    // Saçlar
+    ctx.fillStyle = hairColor;
+    ctx.beginPath();
+    ctx.arc(0, -15, 11, Math.PI, Math.PI * 2);
+    ctx.fill();
+
+    // Basit yüz detayları (Gözler)
+    ctx.fillStyle = "#2b211b";
+    ctx.fillRect(-4, -11, 2, 3);
+    ctx.fillRect(2, -11, 2, 3);
+
+    ctx.restore();
+}
+
+// --- GERÇEKÇİ ÇORBA KASESİ ÇİZİM FONKSİYONU ---
+function drawSoupBowlReal(x, y, soupType) {
+    let soupObj = soups.find(s => s.id === soupType) || soups[0];
+
+    ctx.save();
+    ctx.translate(x, y);
+
+    // Kase Gölgesi
+    ellipse(0, 6, 15, 6, "#00000033");
+
+    // Seramik Kase Dışı (Beyaz)
+    ellipse(0, 0, 15, 9, "#ffffff", "#4a3324", 2);
+
+    // Kase İçi (Çorba Rengi)
+    ellipse(0, -1, 12, 6, soupObj.color);
+
+    // Çorba Üzeri Yağ/Sos/Baharat Detayları (Görsel Zenginlik)
+    if (soupObj.id === 'mercimek') {
+        ellipse(-2, -1, 4, 2, "#f8d568");
+        line(-5, -2, 3, 1, "#b84735", 1.5);
+    } else if (soupObj.id === 'ezogelin') {
+        ellipse(1, -1, 3, 2, "#e07a5f");
+        ellipse(-3, 0, 2, 1.5, "#466b4b");
+    } else {
+        ellipse(0, -1, 5, 2.5, "#fff3d1");
+        ellipse(-3, -1, 2, 1.5, "#b84735");
+    }
+
+    // Minik Duman Efekti
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(-3, -7);
+    ctx.quadraticCurveTo(-6, -11, -2, -15);
+    ctx.stroke();
+
+    ctx.restore();
+}
+
 function drawBackground(){
  const g=ctx.createLinearGradient(0,0,0,675);g.addColorStop(0,"#a9ad8a");g.addColorStop(.52,"#d3c49d");g.addColorStop(1,"#8e8065");ctx.fillStyle=g;ctx.fillRect(0,0,1000,675);
  poly([[0,0],[1000,0],[1000,420],[0,420]],"#c9b38d",null);
@@ -260,38 +333,42 @@ function drawCounter(){
  ellipse(866,399,29,10,"#d8b77a");for(let i=0;i<3;i++){ctx.save();ctx.translate(851+i*14,393);ctx.rotate(-.5);ellipse(0,0,9,5,"#f5d45e","#bd9a3d");ctx.restore()}
  rr(914,365,20,30,4,"#b8d1c1aa","#75523a",2);rr(917,373,14,18,3,"#9c4b28");line(934,373,941,368,"#76513b",3);
 
- // EKSTRA: Tezgahın üzerine ekstra sıcak çorba kaseleri ekledik (Görsel zenginlik için)
- ellipse(470, 390, 14, 6, "#f4e5ca", "#78563b"); ellipse(470, 388, 10, 4, "#d66d3c");
- ellipse(510, 375, 14, 6, "#f4e5ca", "#78563b"); ellipse(510, 373, 10, 4, "#e9a52d");
+ // Tezgah üzerindeki hazır kaseler
+ drawSoupBowlReal(470, 390, 'mercimek');
+ drawSoupBowlReal(510, 375, 'ezogelin');
 }
-function drawPerson(x,y,emoji,scale=1){
- ellipse(x,y+18*scale,23*scale,8*scale,"#3d302744");
- ctx.font=`${40*scale}px serif`;ctx.textAlign="center";ctx.fillText(emoji,x,y+8*scale);
-}
+
 function drawCustomers(){
- // 1. Masa (Sol taraf arka)
+ // 1. Sol Arka Masa ve Oturan Modellenmiş Müşteriler
  ellipse(620, 475, 55, 15, "#45382c44");
  poly([[580, 440],[655, 440],[675, 458],[600, 458]],"#bd8952","#68482f",3);
- drawPerson(595, 415, "👵🏻", .75); drawPerson(640, 418, "👴🏻", .75);
- ellipse(618, 445, 12, 5, "#f4e5ca", "#78563b"); ellipse(618, 443, 8, 3, "#bd4c2e"); // Çorba kasesi
+ drawModelCharacter(595, 410, "#b84735", "#3d281a", 0.75); // Yaşlı Teyze
+ drawModelCharacter(640, 413, "#466b4b", "#634028", 0.75); // Amca
+ drawSoupBowlReal(618, 445, 'tarhana'); // Masadaki gerçek çorba
 
- // 2. Masa (Sağ taraf - Orijinal masa)
+ // 2. Sağ Taraf Ana Masa ve Oturan Modellenmiş Müşteriler
  ellipse(784,475,65,17,"#45382c44");
  poly([[728,435],[817,435],[847,457],[754,457]],"#bd8952","#68482f",3);
  poly([[754,457],[847,457],[847,468],[754,468]],"#805636");
  line(773,468,766,526,"#553c2b",7);line(829,468,836,526,"#553c2b",7);
- drawPerson(768,415,"👩🏻‍🦰",.83);drawPerson(833,420,"👨🏽",.82);
- ellipse(796,441,16,7,"#f4e5ca","#78563b");ellipse(796,439,12,5,"#d66d3c");
+ drawModelCharacter(768, 405, "#3d5a80", "#293241", 0.85); // Genç Kadın
+ drawModelCharacter(833, 410, "#e07a5f", "#3d281a", 0.85); // Genç Adam
+ drawSoupBowlReal(796, 441, 'ezogelin'); // Masadaki gerçek çorba
 
- // 3. Masa (Ön sol - Ekstra kalabalık müşteri)
+ // 3. Ön Sol Masa ve Oturan Modellenmiş Müşteriler
  ellipse(390, 560, 65, 17, "#45382c44");
  poly([[334, 520],[423, 520],[453, 542],[360, 542]],"#bd8952","#68482f",3);
- drawPerson(365, 500, "🧑🏻‍🎓", .82); drawPerson(420, 502, "👩🏻", .82);
- ellipse(395, 527, 14, 6, "#f4e5ca", "#78563b"); ellipse(395, 525, 10, 4, "#e8d8b4"); // Çorba kasesi
+ drawModelCharacter(365, 495, "#9b5de5", "#1d1124", 0.8); // Öğrenci
+ drawModelCharacter(420, 498, "#f15bb5", "#3a0ca3", 0.8); // Müşteri
+ drawSoupBowlReal(395, 527, 'iskembe'); // Masadaki gerçek çorba
 
- // Sayaç/Tezgah başındaki aktif müşteri
- if(customersInScene.length)drawPerson(483,380,customersInScene[customersInScene.length-1].emoji,.95);
+ // Tezgah önündeki aktif müşteri (Sırada bekleyen)
+ if(customersInScene.length) {
+     let c = customersInScene[customersInScene.length-1];
+     drawModelCharacter(483, 380, "#2a9d8f", "#264653", 0.9);
+ }
 }
+
 function drawSign(){
  rr(380,222,242,75,8,"#4a3426","#c49b61",4);
  text("NIGHT OWL",501,253,26,"#f7d99d","800 26px Fraunces");
