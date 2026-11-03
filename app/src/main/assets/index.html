@@ -1,441 +1,342 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Soup House - Pro Landscape Diner</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: #0c0705;
-            color: #f8f9fa;
-            font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            user-select: none;
-        }
-
-        #hud-bar {
-            width: 800px;
-            background: linear-gradient(180deg, #3a2012 0%, #201109 100%);
-            border: 2px solid #d4af37;
-            border-bottom: none;
-            border-radius: 10px 10px 0 0;
-            padding: 8px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.6);
-        }
-
-        .brand {
-            font-size: 18px;
-            font-weight: bold;
-            color: #ffb703;
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 4px #000;
-        }
-
-        .stats-group {
-            display: flex;
-            gap: 25px;
-            font-size: 15px;
-            font-weight: bold;
-        }
-
-        .stat-item {
-            background: rgba(0,0,0,0.4);
-            padding: 4px 12px;
-            border-radius: 6px;
-            border: 1px solid #5c3a21;
-        }
-
-        .stat-score { color: #52b788; }
-        .stat-time { color: #e63946; }
-        .stat-holding { color: #ffb703; }
-
-        canvas {
-            background: #180d08;
-            border: 3px solid #d4af37;
-            border-radius: 0 0 10px 10px;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.9);
-            cursor: pointer;
-        }
-
-        #footer-hints {
-            margin-top: 6px;
-            font-size: 12px;
-            color: #a8a29e;
-            letter-spacing: 0.5px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Night Owl Soup House</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,700;9..144,800&display=swap');
+:root{
+  --ink:#2b211b;--cream:#f7edda;--paper:#fff8e9;--red:#b83e2f;--gold:#e8ad4d;
+  --green:#466b4b;--muted:#8b7764;--line:#e8d8bf;--shadow:0 18px 45px #39271924;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#201a17;color:var(--ink);font-family:"DM Sans",sans-serif;min-height:100vh}
+button{font:inherit;cursor:pointer}
+#app{max-width:1500px;margin:auto;min-height:100vh;background:#f2e5ce;overflow:hidden;box-shadow:0 0 80px #0008}
+.topbar{height:72px;background:#33241d;color:#fff1d7;display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-bottom:4px solid #9a4a32}
+.brand{display:flex;align-items:center;gap:12px;font-family:Fraunces,serif;font-size:25px;letter-spacing:.3px}
+.brand-mark{width:42px;height:42px;border-radius:50%;background:#d95c3f;display:grid;place-items:center;font-size:24px;box-shadow:inset 0 -4px #8f3528}
+.top-stats{display:flex;gap:20px;align-items:center;font-size:13px;font-weight:800}
+.stat{display:flex;gap:7px;align-items:center;background:#ffffff12;padding:9px 13px;border:1px solid #ffffff18;border-radius:12px}
+.stat b{color:#ffd27b;font-size:15px}
+main{display:grid;grid-template-columns:minmax(0,1fr) 345px;min-height:calc(100vh - 72px)}
+.scene-wrap{padding:20px 20px 16px;min-width:0;background:linear-gradient(180deg,#e8d6b8,#f2e5ce)}
+.scene-head{display:flex;justify-content:space-between;align-items:end;margin:0 4px 12px}
+.eyebrow{font-size:10px;letter-spacing:2px;font-weight:800;color:#a15b3b;text-transform:uppercase}
+h1{font:800 clamp(25px,3vw,38px) Fraunces,serif;margin:2px 0 0;color:#38271e}
+.scene-sub{font-size:12px;color:#8a725d;margin-top:4px}
+.open-sign{background:#416344;color:#f8edcf;padding:9px 13px;border-radius:7px;font-size:11px;font-weight:800;letter-spacing:1px;box-shadow:0 4px #2b452e;white-space:nowrap}
+.canvas-frame{position:relative;background:#a7a17b;border:8px solid #fff5df;border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+#game{width:100%;height:auto;display:block;aspect-ratio: 1.48 / 1;touch-action:manipulation}
+.scene-tip{position:absolute;left:14px;bottom:12px;background:#34271edb;color:#fff0d3;border-radius:8px;padding:8px 11px;font-size:11px;pointer-events:none}
+.bottom-strip{display:flex;gap:10px;margin-top:13px;align-items:stretch}
+.mini-card{flex:1;background:#fff8e9;border:1px solid #e4d2b4;border-radius:12px;padding:10px 13px;display:flex;align-items:center;gap:10px;min-width:0}
+.mini-icon{font-size:22px}.mini-card strong{display:block;font-size:12px}.mini-card small{display:block;color:#8c7763;font-size:10px;margin-top:2px}
+.sidebar{background:#fff8e9;border-left:1px solid #e5d5bc;padding:20px 18px;display:flex;flex-direction:column;gap:14px}
+.panel-title{font:800 20px Fraunces,serif;margin:0}
+.panel-kicker{font-size:10px;color:#a17f60;letter-spacing:1.5px;font-weight:800;text-transform:uppercase;margin-bottom:4px}
+.order-panel{background:#f4e7d2;border:1px solid #e5d2b3;border-radius:15px;padding:14px}
+.order-top{display:flex;justify-content:space-between;align-items:center}
+.order-count{background:#b84735;color:white;border-radius:20px;padding:5px 9px;font-size:11px;font-weight:800}
+.customer-line{display:flex;align-items:center;gap:10px;margin:13px 0 10px}
+.avatar{width:48px;height:48px;border-radius:14px;background:#e4b57a;display:grid;place-items:center;font-size:29px;border:2px solid #fff8e9}
+.customer-name{font-weight:800;font-size:14px}.customer-mood{font-size:11px;color:#8a725e;margin-top:3px}
+.order-request{background:#fff8e9;border-radius:10px;padding:11px;margin:10px 0;font-size:12px;line-height:1.5}
+.order-request b{color:#a63e30}
+.timer-row{display:flex;justify-content:space-between;color:#846d57;font-size:10px;font-weight:800;margin-bottom:5px}
+.timer-track{height:7px;background:#dfd0b7;border-radius:9px;overflow:hidden}.timer-fill{height:100%;width:100%;background:#5d8758;transition:width .3s,background .3s}
+.soup-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.soup-btn{background:#fffaf0;border:1px solid #e7d7bd;border-radius:12px;padding:9px 8px;text-align:left;transition:.16s;min-width:0;color:var(--ink)}
+.soup-btn:hover{transform:translateY(-2px);border-color:#c66a45;box-shadow:0 5px 12px #68432618}
+.soup-btn.selected{border:2px solid #b84b36;background:#fff0df;padding:8px 7px;box-shadow:0 0 0 3px #b84b361c}
+.soup-emoji{font-size:25px;display:block;margin-bottom:4px}.soup-name{font-size:11px;font-weight:800;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.soup-desc{font-size:9px;color:#947d66;display:block;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.serve-btn{width:100%;border:0;background:#b74635;color:#fff6e7;border-radius:11px;padding:13px;font-weight:800;letter-spacing:.4px;margin-top:11px;box-shadow:0 4px #823126;transition:.12s}
+.serve-btn:hover{background:#c6533f;transform:translateY(-1px)}.serve-btn:active{transform:translateY(2px);box-shadow:0 2px #823126}
+.serve-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.feedback{font-size:11px;min-height:18px;text-align:center;color:#6d7d4d;margin-top:8px;font-weight:700}
+.rating-panel{border:1px solid #e7d7bd;border-radius:14px;padding:13px}
+.rating-head{display:flex;justify-content:space-between;align-items:center}.rating-big{font:800 27px Fraunces;color:#b54a35}
+.stars{color:#e4a83f;letter-spacing:2px;font-size:15px}
+.rating-note{font-size:10px;color:#8b7764;margin-top:4px}
+.log-panel{background:#352820;color:#f7e8cd;border-radius:14px;padding:13px;flex:1;min-height:120px}
+.log-title{font:700 15px Fraunces;margin-bottom:9px}.log-list{display:flex;flex-direction:column;gap:8px;font-size:10px;color:#e7d2b4}.log-item{display:flex;gap:7px;line-height:1.35}.log-item span{color:#efb35d}
+.footer-note{font-size:9px;color:#a28b72;text-align:center;margin-top:2px}
+.overlay{position:fixed;inset:0;background:#1d1714b8;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}
+.overlay.show{display:flex}
+.modal{max-width:440px;width:100%;background:#fff5e3;border-radius:20px;padding:27px;text-align:center;box-shadow:0 25px 80px #0007;border:5px solid #e6c99e}
+.modal-emoji{font-size:48px}.modal h2{font:800 30px Fraunces;margin:8px 0;color:#39271d}.modal p{font-size:13px;line-height:1.6;color:#806c57}
+.modal-stats{display:flex;justify-content:center;gap:22px;margin:18px 0}.modal-stats b{display:block;font:800 24px Fraunces;color:#b74735}.modal-stats small{font-size:10px;color:#8a725c}
+.modal button{border:0;border-radius:11px;background:#b74635;color:#fff4e3;padding:13px 22px;font-weight:800;box-shadow:0 4px #823126}
+.toast{position:fixed;top:88px;left:50%;transform:translateX(-50%) translateY(-12px);opacity:0;background:#352820;color:#fff0d4;padding:11px 17px;border-radius:12px;font-size:12px;font-weight:800;z-index:20;transition:.25s;pointer-events:none;box-shadow:0 8px 30px #0003}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:950px){main{grid-template-columns:1fr}.sidebar{border-left:0;border-top:1px solid #e5d5bc;display:grid;grid-template-columns:1fr 1fr;align-items:start}.order-panel{grid-row:span 2}.log-panel{min-height:150px}}
+@media(max-width:620px){.topbar{height:auto;min-height:65px;padding:10px 13px;gap:8px}.brand{font-size:19px}.top-stats{gap:5px}.stat{padding:7px;font-size:10px}.stat b{font-size:12px}main{display:block}.scene-wrap{padding:13px 10px}.scene-head{align-items:center}.open-sign{font-size:9px;padding:8px}.canvas-frame{border-width:5px}.bottom-strip{gap:6px}.mini-card{padding:8px;gap:6px}.mini-card small{font-size:9px}.sidebar{display:flex;padding:13px 10px}.soup-grid{grid-template-columns:repeat(3,1fr)}.soup-btn{padding:8px 5px}.soup-name{font-size:10px}.soup-desc{font-size:8px}.order-panel{padding:12px}}
+</style>
 </head>
 <body>
-
-    <div id="hud-bar">
-        <div class="brand">THE SOUP HOUSE</div>
-        <div class="stats-group">
-            <div class="stat-item">EARNINGS: $<span id="score" class="stat-score">0</span></div>
-            <div class="stat-item">TIME: <span id="timer" class="stat-time">60</span>s</div>
-            <div class="stat-item">CARRYING: <span id="holding" class="stat-holding">EMPTY</span></div>
-        </div>
-    </div>
-
-    <canvas id="gameCanvas" width="800" height="450"></canvas>
-
-    <div id="footer-hints">
-        💡 <b>How to Play:</b> Click queue to seat customers ➔ Click pots to pick soup ➔ Click table to serve!
-    </div>
-
-    <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-
-        // Game State
-        let score = 0;
-        let timeLeft = 60;
-        let isGameActive = true;
-
-        // Chef (Player) Object
-        const chef = {
-            x: 400,
-            y: 180,
-            targetX: 400,
-            targetY: 180,
-            speed: 0.12,
-            holding: null,
-            facing: 'right'
-        };
-
-        // Soups Configuration
-        const soups = [
-            { id: 'Lentil', name: 'Lentil Soup', mainColor: '#e9c46a', oilColor: '#e63946', x: 260, y: 55 },
-            { id: 'Iskembe', name: 'İşkembe', mainColor: '#f4f1de', oilColor: '#e63946', x: 350, y: 55 },
-            { id: 'Beyran', name: 'Beyran', mainColor: '#d62828', oilColor: '#ffb703', x: 440, y: 55 },
-            { id: 'Ezogelin', name: 'Ezogelin', mainColor: '#f4a261', oilColor: '#d62828', x: 530, y: 55 }
-        ];
-
-        // Tables Layout (Landscape 6 Tables)
-        const tables = [
-            { id: 1, x: 180, y: 200, status: 'empty', customer: null, order: null, eatTimer: 0 },
-            { id: 2, x: 400, y: 200, status: 'empty', customer: null, order: null, eatTimer: 0 },
-            { id: 3, x: 620, y: 200, status: 'empty', customer: null, order: null, eatTimer: 0 },
-            { id: 4, x: 180, y: 350, status: 'empty', customer: null, order: null, eatTimer: 0 },
-            { id: 5, x: 400, y: 350, status: 'empty', customer: null, order: null, eatTimer: 0 },
-            { id: 6, x: 620, y: 350, status: 'empty', customer: null, order: null, eatTimer: 0 }
-        ];
-
-        // Customer Queue
-        let queue = [];
-        const maxQueue = 4;
-        const customerColors = ['#2a9d8f', '#e76f51', '#457b9d', '#9b5de5', '#f4a261'];
-
-        // Customer Spawner
-        setInterval(() => {
-            if (isGameActive && queue.length < maxQueue) {
-                const randomSoup = soups[Math.floor(Math.random() * soups.length)].id;
-                const randomColor = customerColors[Math.floor(Math.random() * customerColors.length)];
-                queue.push({
-                    id: Date.now(),
-                    color: randomColor,
-                    order: randomSoup
-                });
-            }
-        }, 3000);
-
-        // Timer Loop
-        const timerObj = setInterval(() => {
-            if (isGameActive) {
-                timeLeft--;
-                document.getElementById("timer").innerText = timeLeft;
-                if (timeLeft <= 0) {
-                    isGameActive = false;
-                    clearInterval(timerObj);
-                    setTimeout(() => alert("Shift Finished! Total Earnings: $" + score), 100);
-                }
-            }
-        }, 1000);
-
-        // Interaction Listener
-        canvas.addEventListener("click", (e) => {
-            if (!isGameActive) return;
-
-            const rect = canvas.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const clickY = e.clientY - rect.top;
-
-            // 1. Kitchen Counter Pots Click
-            soups.forEach(soup => {
-                if (Math.hypot(clickX - soup.x, clickY - soup.y) < 32) {
-                    chef.targetX = soup.x;
-                    chef.targetY = soup.y + 55;
-                    chef.holding = soup.id;
-                    updateHUD();
-                }
-            });
-
-            // 2. Queue Click (Seat Customer)
-            if (clickX < 80 && clickY > 100 && clickY < 380 && queue.length > 0) {
-                let freeTable = tables.find(t => t.status === 'empty');
-                if (freeTable) {
-                    let cust = queue.shift();
-                    freeTable.status = 'waiting';
-                    freeTable.customer = cust;
-                    freeTable.order = cust.order;
-                }
-            }
-
-            // 3. Table Click (Serve)
-            tables.forEach(table => {
-                if (Math.hypot(clickX - table.x, clickY - table.y) < 50) {
-                    chef.targetX = table.x;
-                    chef.targetY = table.y + 40;
-
-                    if (table.status === 'waiting' && chef.holding) {
-                        if (chef.holding === table.order) {
-                            score += 20;
-                            table.status = 'eating';
-                            table.eatTimer = 200;
-                            chef.holding = null;
-                        } else {
-                            score = Math.max(0, score - 5);
-                            chef.holding = null;
-                        }
-                        updateHUD();
-                    }
-                }
-            });
-        });
-
-        function updateHUD() {
-            document.getElementById("score").innerText = score;
-            document.getElementById("holding").innerText = chef.holding ? chef.holding : "EMPTY";
-        }
-
-        // --- RENDER ENGINE ---
-
-        function drawFloor() {
-            // Dark Wood Floor
-            ctx.fillStyle = "#20120b";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Wood Planks
-            ctx.strokeStyle = "#140b06";
-            ctx.lineWidth = 2;
-            for (let y = 100; y < canvas.height; y += 35) {
-                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
-            }
-
-            // Kitchen Bar Area
-            ctx.fillStyle = "#3d2214";
-            ctx.fillRect(0, 0, canvas.width, 100);
-            ctx.fillStyle = "#5c341e";
-            ctx.fillRect(0, 92, canvas.width, 8);
-
-            // Red Carpet Waiting Zone
-            ctx.fillStyle = "#6b0f1a";
-            ctx.fillRect(10, 120, 55, 280);
-            ctx.strokeStyle = "#d4af37";
-            ctx.lineWidth = 2;
-            ctx.strokeRect(10, 120, 55, 280);
-
-            ctx.fillStyle = "#d4af37";
-            ctx.font = "bold 10px Arial";
-            ctx.textAlign = "center";
-            ctx.fillText("WAITING", 37, 112);
-        }
-
-        function drawPots() {
-            soups.forEach(soup => {
-                // Copper Pot
-                ctx.beginPath();
-                ctx.arc(soup.x, soup.y, 25, 0, Math.PI * 2);
-                ctx.fillStyle = "#b85d19";
-                ctx.fill();
-                ctx.strokeStyle = "#5a2a08";
-                ctx.lineWidth = 3;
-                ctx.stroke();
-
-                // Liquid
-                ctx.beginPath();
-                ctx.arc(soup.x, soup.y, 18, 0, Math.PI * 2);
-                ctx.fillStyle = soup.mainColor;
-                ctx.fill();
-
-                // Butter Oil Swirl
-                ctx.beginPath();
-                ctx.arc(soup.x - 3, soup.y - 3, 7, 0, Math.PI * 2);
-                ctx.fillStyle = soup.oilColor;
-                ctx.fill();
-
-                // Pot Handles
-                ctx.fillStyle = "#3a1e0b";
-                ctx.fillRect(soup.x - 31, soup.y - 4, 6, 8);
-                ctx.fillRect(soup.x + 25, soup.y - 4, 6, 8);
-
-                // Label
-                ctx.fillStyle = "#ffb703";
-                ctx.font = "bold 11px Arial";
-                ctx.textAlign = "center";
-                ctx.fillText(soup.name, soup.x, soup.y + 38);
-            });
-        }
-
-        function drawTables() {
-            tables.forEach(t => {
-                // Table Shadow
-                ctx.beginPath();
-                ctx.ellipse(t.x, t.y + 20, 42, 15, 0, 0, Math.PI * 2);
-                ctx.fillStyle = "rgba(0,0,0,0.5)";
-                ctx.fill();
-
-                // Wooden Table Top
-                ctx.beginPath();
-                ctx.arc(t.x, t.y, 38, 0, Math.PI * 2);
-                ctx.fillStyle = "#633722";
-                ctx.fill();
-                ctx.strokeStyle = "#381e13";
-                ctx.lineWidth = 4;
-                ctx.stroke();
-
-                // Inner Wood Grain
-                ctx.beginPath();
-                ctx.arc(t.x, t.y, 28, 0, Math.PI * 2);
-                ctx.fillStyle = "#734028";
-                ctx.fill();
-
-                // Table Number
-                ctx.fillStyle = "rgba(255,255,255,0.15)";
-                ctx.font = "bold 14px Arial";
-                ctx.textAlign = "center";
-                ctx.fillText(t.id, t.x, t.y + 5);
-
-                // Customer Logic
-                if (t.status !== 'empty' && t.customer) {
-                    drawPerson(t.x, t.y - 20, t.customer.color, false);
-
-                    if (t.status === 'waiting') {
-                        drawBubble(t.x + 25, t.y - 45, t.order);
-                    } else if (t.status === 'eating') {
-                        drawSoupBowl(t.x, t.y, t.order);
-                        t.eatTimer--;
-                        if (t.eatTimer <= 0) {
-                            t.status = 'empty';
-                            t.customer = null;
-                            t.order = null;
-                        }
-                    }
-                }
-            });
-        }
-
-        function drawPerson(x, y, color, isChef) {
-            // Shadow
-            ctx.beginPath();
-            ctx.ellipse(x, y + 18, 14, 6, 0, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(0,0,0,0.4)";
-            ctx.fill();
-
-            // Body / Torso
-            ctx.beginPath();
-            ctx.arc(x, y + 6, 13, 0, Math.PI * 2);
-            ctx.fillStyle = color;
-            ctx.fill();
-
-            // Head
-            ctx.beginPath();
-            ctx.arc(x, y - 8, 10, 0, Math.PI * 2);
-            ctx.fillStyle = "#f1c27d";
-            ctx.fill();
-
-            if (isChef) {
-                // Chef Mustache & Hat
-                ctx.fillStyle = "#3d2314";
-                ctx.fillRect(x - 5, y - 6, 10, 3);
-
-                // Big Chef Hat
-                ctx.fillStyle = "#ffffff";
-                ctx.fillRect(x - 9, y - 22, 18, 10);
-                ctx.beginPath();
-                ctx.arc(x, y - 22, 11, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        function drawChef() {
-            // Interpolated Smooth Movement
-            chef.x += (chef.targetX - chef.x) * chef.speed;
-            chef.y += (chef.targetY - chef.y) * chef.speed;
-
-            drawPerson(chef.x, chef.y, "#9e2a2b", true);
-
-            // Carried Dish Tray
-            if (chef.holding) {
-                ctx.fillStyle = "#a8a29e";
-                ctx.beginPath();
-                ctx.arc(chef.x + 18, chef.y, 10, 0, Math.PI * 2);
-                ctx.fill();
-                drawSoupBowl(chef.x + 18, chef.y, chef.holding);
-            }
-        }
-
-        function drawQueue() {
-            queue.forEach((cust, i) => {
-                drawPerson(37, 150 + (i * 55), cust.color, false);
-            });
-        }
-
-        function drawBubble(x, y, orderId) {
-            ctx.fillStyle = "#ffffff";
-            ctx.beginPath();
-            ctx.roundRect(x - 18, y - 16, 42, 30, 8);
-            ctx.fill();
-            ctx.strokeStyle = "#ffb703";
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            drawSoupBowl(x + 3, y - 1, orderId);
-        }
-
-        function drawSoupBowl(x, y, soupId) {
-            let soupObj = soups.find(s => s.id === soupId);
-            if (!soupObj) return;
-
-            // Ceramic Bowl
-            ctx.beginPath();
-            ctx.arc(x, y, 9, 0, Math.PI * 2);
-            ctx.fillStyle = "#ffffff";
-            ctx.fill();
-            ctx.strokeStyle = "#2b1810";
-            ctx.lineWidth = 1;
-            ctx.stroke();
-
-            // Soup Liquid inside bowl
-            ctx.beginPath();
-            ctx.arc(x, y, 7, 0, Math.PI * 2);
-            ctx.fillStyle = soupObj.mainColor;
-            ctx.fill();
-        }
-
-        // --- MAIN LOOP ---
-        function render() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            drawFloor();
-            drawPots();
-            drawTables();
-            drawQueue();
-            drawChef();
-
-            requestAnimationFrame(render);
-        }
-
-        render();
-    </script>
+<div id="app">
+<header class="topbar">
+  <div class="brand"><div class="brand-mark">🥣</div>NIGHT OWL <span style="font:600 10px 'DM Sans';color:#d7a56d;letter-spacing:2px">· SOUP HOUSE</span></div>
+  <div class="top-stats">
+    <div class="stat">🪙 <b id="money">₺450</b></div>
+    <div class="stat">⭐ <b id="rep">4.8</b></div>
+    <div class="stat">📅 <b id="day">1. Gün</b></div>
+  </div>
+</header>
+<main>
+<section class="scene-wrap">
+  <div class="scene-head">
+    <div><div class="eyebrow">ISTANBUL · BACKSTREETS</div><h1>A bowl of warmth.</h1><div class="scene-sub">The night is long. The soup is always hot.</div></div>
+    <div class="open-sign">● OPEN · 11:40 PM</div>
+  </div>
+  <div class="canvas-frame">
+    <canvas id="game" width="1000" height="675" aria-label="Yarı izometrik Türk çorbacısı oyun sahnesi"></canvas>
+    <div class="scene-tip">👆 Pick a soup and serve your guest.</div>
+  </div>
+  <div class="bottom-strip">
+    <div class="mini-card"><div class="mini-icon">🔥</div><div><strong>The pots are simmering</strong><small>Freshly prepared, every bowl.</small></div></div>
+    <div class="mini-card"><div class="mini-icon">🥖</div><div><strong>Bread is on the house</strong><small>Warm, crusty, always.</small></div></div>
+    <div class="mini-card"><div class="mini-icon">🌙</div><div><strong>The night shift</strong><small>The neighborhood never sleeps.</small></div></div>
+  </div>
+</section>
+<aside class="sidebar">
+  <section class="order-panel">
+    <div class="order-top"><div><div class="panel-kicker">NEXT GUEST</div><h2 class="panel-title">Order ticket</h2></div><div class="order-count" id="queue">1 / 1</div></div>
+    <div class="customer-line"><div class="avatar" id="avatar">🧔🏻</div><div><div class="customer-name" id="customer">Hasan Usta</div><div class="customer-mood" id="mood">“I need something to warm me up...”</div></div></div>
+    <div class="order-request" id="request">Bir porsiyon <b>Ezogelin</b> rica ediyorum. Bol limon olsun!</div>
+    <div class="timer-row"><span>PATIENCE / WAIT TIME</span><span id="time-label">25 sn</span></div>
+    <div class="timer-track"><div class="timer-fill" id="timer"></div></div>
+    <div class="panel-kicker" style="margin-top:15px">SOUP MENU</div>
+    <div class="soup-grid" id="soup-grid"></div>
+    <button class="serve-btn" id="serve" disabled>CHOOSE A SOUP FIRST</button>
+    <div class="feedback" id="feedback">Waiting for your selection.</div>
+  </section>
+  <section class="rating-panel">
+    <div class="rating-head"><div><div class="panel-kicker">RATING</div><div class="panel-title">Customer satisfaction</div></div><div class="rating-big" id="rating">4.8</div></div>
+    <div class="stars" id="stars">★★★★★</div><div class="rating-note" id="rating-note">A neighborhood favorite.</div>
+  </section>
+  <section class="log-panel"><div class="log-title">📜 SHOP JOURNAL</div><div class="log-list" id="log"><div class="log-item"><span>✦</span> The shutters are up. The first guest is on the way...</div><div class="log-item"><span>✦</span> Lentil soup is simmering. Fresh bread is ready.</div></div></section>
+  <div class="footer-note">NIGHT OWL · A warm little neighborhood story</div>
+</aside>
+</main>
+</div>
+<div class="overlay" id="end-overlay"><div class="modal"><div class="modal-emoji">🌙🥣</div><h2>Last bowl of the night!</h2><p>The neighborhood is slowly falling asleep. Before closing up, take a look at tonight’s earnings and the smiles you served.</p><div class="modal-stats"><div><b id="end-money">₺0</b><small>TONIGHT’S EARNINGS</small></div><div><b id="end-served">0</b><small>BOWLS SERVED</small></div><div><b id="end-rating">4.8</b><small>RATING</small></div></div><button id="next-day">START A NEW DAY →</button></div></div>
+<div class="toast" id="toast"></div>
+<script>
+(() => {
+"use strict";
+const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
+const $=id=>document.getElementById(id);
+const soups=[
+ {id:"mercimek",name:"Lentil Soup",desc:"Golden yellow · buttery",emoji:"🟡",color:"#e9a52d",inside:"#f4c65e",garnish:"pepper",price:55},
+ {id:"ezogelin",name:"Ezogelin Soup",desc:"Rust red · hearty · mint",emoji:"🔴",color:"#bd4c2e",inside:"#d96b3e",garnish:"mint",price:60},
+ {id:"iskembe",name:"Tripe Soup",desc:"Creamy white · garlicky",emoji:"⚪",color:"#e8d8b4",inside:"#f4e9d0",garnish:"garlic",price:75},
+ {id:"tarhana",name:"Tarhana Soup",desc:"Terracotta · rich and hearty",emoji:"🟠",color:"#bd6337",inside:"#d77b43",garnish:"butter",price:55},
+ {id:"yayla",name:"Yogurt Soup",desc:"Yogurt white · mint",emoji:"🥛",color:"#e8e0c7",inside:"#f5efd9",garnish:"mint",price:60},
+ {id:"kelle",name:"Head & Trotter",desc:"Pale and rich · extra lemon",emoji:"🍋",color:"#d9c49c",inside:"#eadbb9",garnish:"lemon",price:90}
+];
+const people=[
+ {name:"Hasan",avatar:"🧔🏻",mood:"“I need something to warm me up...”",extra:"Extra lemon, please!"},
+ {name:"Elif",avatar:"👩🏻‍🦱",mood:"“It’s been a long day.”",extra:"I love a little mint."},
+ {name:"Murat",avatar:"👨🏽",mood:"“Just finished my shift.”",extra:"Some bread on the side, too."},
+ {name:"Zeynep",avatar:"👩🏻",mood:"“Something light but tasty.”",extra:"Not too spicy, please."},
+ {name:"Cem the Taxi Driver",avatar:"👨🏻‍🦲",mood:"“I’ve been freezing out there.”",extra:"Make sure it’s piping hot."},
+ {name:"Can the Student",avatar:"🧑🏻‍🎓",mood:"“Let’s keep it budget-friendly.”",extra:"And some bread, please."},
+ {name:"Nermin",avatar:"👵🏻",mood:"“Make it taste homemade.”",extra:"A little mint on top would be lovely."},
+ {name:"Night Watchman",avatar:"👮🏻",mood:"“Just finished my neighborhood rounds.”",extra:"Something hearty, please."}
+];
+let money=450,rep=4.8,day=1,served=0,dayServed=0,selected=null,customer=null,timeLeft=25,maxTime=25,active=true,spawnTimer=0,queueNo=1,logs=[];
+let particles=[],steam=[],ambient=0,customersInScene=[];
+const rnd=(a,b)=>Math.random()*(b-a)+a;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function log(msg){logs.unshift(msg);logs=logs.slice(0,5);$("log").innerHTML=logs.map(x=>`<div class="log-item"><span>✦</span>${x}</div>`).join("")}
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800)}
+function newCustomer(){
+ customer=pick(people);timeLeft=maxTime=Math.max(15,27-Math.min(day*1.5,8));selected=null;
+ const soup=pick(soups);customer.order=soup.id;
+ $("avatar").textContent=customer.avatar;$("customer").textContent=customer.name;
+ $("mood").textContent=customer.mood;
+ $("request").innerHTML=`I’ll have a bowl of <b>${soup.name}</b>, please. ${customer.extra}`;
+ $("queue").textContent=`${queueNo} / 1`;$("feedback").textContent="Waiting for your selection.";
+ $("serve").disabled=true;$("serve").textContent="CHOOSE A SOUP FIRST";
+ $("time-label").textContent=Math.ceil(timeLeft)+" sn";renderSoups();addSceneCustomer();
+}
+function renderSoups(){
+ $("soup-grid").innerHTML=soups.map(s=>`<button class="soup-btn ${selected===s.id?"selected":""}" data-id="${s.id}"><span class="soup-emoji">${s.emoji}</span><span class="soup-name">${s.name}</span><span class="soup-desc">₺${s.price} · ${s.desc}</span></button>`).join("");
+ document.querySelectorAll(".soup-btn").forEach(b=>b.addEventListener("click",()=>{selected=b.dataset.id;renderSoups();$("serve").disabled=false;$("serve").textContent="🥣 SERVE SOUP";}));
+}
+function updateStats(){
+ $("money").textContent="₺"+money;$("rep").textContent=rep.toFixed(1);$("rating").textContent=rep.toFixed(1);
+ $("stars").textContent="★".repeat(Math.round(rep))+"☆".repeat(5-Math.round(rep));
+ $("rating-note").textContent=rep>=4.7?"A neighborhood favorite.":rep>=4?"You are doing well. Regulars are coming back.":"A little more care. The neighborhood believes in you.";
+ $("day").textContent=day+". Gün";
+}
+function serve(){
+ if(!selected||!customer||!active)return;
+ const chosen=soups.find(s=>s.id===selected),correct=chosen.id===customer.order;
+ if(correct){
+  const bonus=Math.round((timeLeft/maxTime)*15),earned=chosen.price+bonus;
+  money+=earned;rep=Math.min(5,rep+.04);served++;dayServed++;
+  $("feedback").textContent=`Perfect service! +₺${earned} · +${bonus} speed bonus`;
+  log(`${customer.name} loved the ${chosen.name}. +₺${earned}`);
+  burst(500,380,"#f8c56d",18);toast("Perfect match! Happy customer. ⭐");
+ }else{
+  money+=Math.round(chosen.price*.35);rep=Math.max(1,rep-.18);
+  $("feedback").textContent="That wasn’t the order... Your guest is a little disappointed.";
+  log(`${customer.name} was disappointed with the wrong soup.`);
+  burst(500,380,"#d56b51",9);toast("Wrong order! Your rating dropped.");
+ }
+ updateStats();selected=null;queueNo++;
+ $("serve").disabled=true;$("serve").textContent="NEXT GUEST ON THE WAY...";
+ setTimeout(()=>{if(active)newCustomer()},1100);
+}
+$("serve").addEventListener("click",serve);
+function addSceneCustomer(){customersInScene.push({x:rnd(680,790),y:rnd(390,435),age:0,emoji:customer.avatar});if(customersInScene.length>3)customersInScene.shift()}
+function burst(x,y,color,n){for(let i=0;i<n;i++)particles.push({x,y,vx:rnd(-3,3),vy:rnd(-4,1),life:rnd(25,45),color,size:rnd(2,5)})}
+function poly(points,fill,stroke="#594332",lw=3){ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);points.slice(1).forEach(p=>ctx.lineTo(p[0],p[1]));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.lineWidth=lw;ctx.strokeStyle=stroke;ctx.stroke()}}
+function rr(x,y,w,h,r,fill,stroke=null,lw=2){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke()}}
+function line(x1,y1,x2,y2,color,width=2){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke()}
+function text(str,x,y,size,color="#4b3829",font="700 16px DM Sans",align="center"){ctx.font=font;ctx.fillStyle=color;ctx.textAlign=align;ctx.fillText(str,x,y)}
+function ellipse(x,y,rx,ry,fill,stroke=null){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke()}}
+function drawBackground(){
+ const g=ctx.createLinearGradient(0,0,0,675);g.addColorStop(0,"#a9ad8a");g.addColorStop(.52,"#d3c49d");g.addColorStop(1,"#8e8065");ctx.fillStyle=g;ctx.fillRect(0,0,1000,675);
+ // back wall
+ poly([[0,0],[1000,0],[1000,420],[0,420]],"#c9b38d",null);
+ // plaster texture
+ for(let i=0;i<90;i++){let x=(i*137)%1000,y=(i*71)%400;ellipse(x,y, rnd(2,8),rnd(1,3),"#a88f6e22")}
+ // upper beams
+ ctx.fillStyle="#725039";ctx.fillRect(0,20,1000,13);ctx.fillRect(0,145,1000,8);
+ // wall tiles
+ for(let y=170;y<420;y+=42)for(let x=0;x<1000;x+=62){ctx.strokeStyle="#a98d6a";ctx.lineWidth=1;ctx.strokeRect(x,y,62,42)}
+ // left window
+ rr(34,45,235,117,8,"#4c5548","#60432e",9);rr(45,56,213,95,4,"#8d9b87","#d9c5a0",3);
+ for(let i=0;i<5;i++){line(48+i*43,59,48+i*43,148,"#5b4835",5)}
+ line(48,103,255,103,"#5b4835",5);
+ // outside night
+ ellipse(80,81,12,12,"#f4d58b");ellipse(211,78,5,5,"#fff0c4");
+ // menu board
+ rr(326,35,340,119,7,"#3b3025","#9a7046",5);
+ text("TODAY’S SOUPS",496,62,17,"#f5d38d","800 17px Fraunces");
+ line(350,74,645,74,"#98734b",1);
+ text("Lentil · Ezogelin · Tripe",496,98,12,"#fff0d0","600 12px DM Sans");
+ text("Yogurt · Tarhana · Head & Trotter",496,122,12,"#fff0d0","600 12px DM Sans");
+ // wall shelf
+ poly([[710,188],[965,188],[943,207],[690,207]],"#815b3c");
+ ctx.fillStyle="#5c402c";ctx.fillRect(701,207,248,10);
+ for(let i=0;i<5;i++){rr(718+i*43,151,29,38,5,["#a64c32","#d2a34e","#687a5d","#d9c7a5","#a64c32"][i],"#65442d",2);ellipse(732+i*43,151,14,5,"#e8d5b3")}
+ // hanging lights
+ for(let x of [345,825]){line(x,0,x,67,"#55402e",3);ellipse(x,74,18,7,"#f0c56e");ellipse(x,78,12,4,"#fff0b5")}
+ // floor
+ poly([[0,420],[1000,420],[1000,675],[0,675]],"#8f7456",null);
+ for(let y=440;y<700;y+=43){line(0,y,1000,y,"#6e5a43",2)}
+ for(let x=-200;x<1200;x+=110){line(x,420,x+170,675,"#6e5a43",2)}
+ // rug
+ poly([[300,496],[737,496],[864,635],[185,635]],"#a74b38","#633c2c",5);
+ for(let i=0;i<4;i++)poly([[320+i*15,510+i*13],[716-i*15,510+i*13],[823-i*18,622-i*7],[226+i*18,622-i*7]],"rgba(0,0,0,0)","#d69b5c",2);
+}
+function drawStove(){
+ // stove shadow and body
+ ellipse(210,480,135,25,"#463a2e44");
+ poly([[75,350],[315,350],[354,391],[110,391]],"#6c5540");
+ poly([[110,391],[354,391],[354,501],[110,501]],"#6b4b35");
+ poly([[75,350],[110,391],[110,501],[75,462]],"#8c6544");
+ for(let i=0;i<3;i++){rr(130+i*69,410,53,72,5,"#4a382c","#33281f",4);ellipse(156+i*69,411,22,7,"#a8a08b");}
+ // copper pots
+ drawPot(139,342,74,60,"#b56d3f","#e8a66a","mercimek");
+ drawPot(236,342,74,60,"#9d5638","#dc8651","ezogelin");
+ // steam
+ for(let p of steam){p.y-=.7;p.x+=Math.sin(p.y/12)*.25;p.life--;ctx.globalAlpha=Math.max(0,p.life/55)*.35;ellipse(p.x,p.y,5,9,"#fff8e8");ctx.globalAlpha=1}
+ if(steam.length<30)steam.push({x:rnd(139,310),y:rnd(300,335),life:55});
+}
+function drawPot(x,y,w,h,metal,liquid,type){
+ // handles and body
+ ctx.fillStyle=metal;ctx.strokeStyle="#65442f";ctx.lineWidth=3;
+ ctx.beginPath();ctx.ellipse(x+w/2,y+h*.22,w/2,h*.23,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+ ctx.fillStyle=metal;ctx.beginPath();ctx.moveTo(x,y+h*.2);ctx.lineTo(x+7,y+h*.85);ctx.quadraticCurveTo(x+w/2,y+h+8,x+w-7,y+h*.85);ctx.lineTo(x+w,y+h*.2);ctx.closePath();ctx.fill();ctx.stroke();
+ ctx.beginPath();ctx.ellipse(x+w/2,y+h*.22,w/2-5,h*.18,0,0,Math.PI*2);ctx.fillStyle=liquid;ctx.fill();ctx.strokeStyle="#f4c38a";ctx.stroke();
+ // visible soup identity
+ if(type==="mercimek"){
+  for(let i=0;i<10;i++)ellipse(x+12+(i*19)%52,y+8+(i*7)%14,2.5,2,"#f6d276");
+  line(x+25,y+10,x+50,y+20,"#a84d2d",3);
+ }else{
+  for(let i=0;i<12;i++){ellipse(x+10+(i*17)%54,y+7+(i*9)%15,2.5,2,"#f3c18a");}
+  for(let i=0;i<4;i++)ellipse(x+18+i*12,y+15,2,2,"#557448");
+ }
+ rr(x-7,y+16,8,18,3,metal,"#65442f");rr(x+w-1,y+16,8,18,3,metal,"#65442f");
+}
+function drawCounter(){
+ // counter back and top
+ poly([[420,357],[850,357],[964,425],[535,425]],"#9d6d48","#5c402d",4);
+ poly([[535,425],[964,425],[964,548],[535,548]],"#6c4932","#4d3528",4);
+ poly([[420,357],[535,425],[535,548],[420,482]],"#815a3d","#4d3528",4);
+ // front panels
+ for(let i=0;i<4;i++){poly([[552+i*99,444],[638+i*99,444],[638+i*99,527],[552+i*99,527]],"#8e6241","#523b2d",2);line(562+i*99,454,628+i*99,454,"#bd8b5e",2)}
+ // counter top items
+ rr(574,364,94,31,5,"#f1e4c9","#72523a",2);text("PICKLES",621,384,11,"#684b35","800 11px DM Sans");
+ // bread basket
+ ellipse(765,394,42,15,"#68452e");ellipse(765,388,40,14,"#d8a45d","#82552f");
+ for(let i=0;i<5;i++){ctx.save();ctx.translate(738+i*13,385+(i%2)*-5);ctx.rotate(-.25+i*.12);rr(-9,-7,21,11,6,"#dba85e","#a66b36",1);line(-4,-5,4,-4,"#f5d18b",1);ctx.restore()}
+ // lemon plate
+ ellipse(866,399,29,10,"#d8b77a");for(let i=0;i<3;i++){ctx.save();ctx.translate(851+i*14,393);ctx.rotate(-.5);ellipse(0,0,9,5,"#f5d45e","#bd9a3d");ctx.restore()}
+ // glass tea
+ rr(914,365,20,30,4,"#b8d1c1aa","#75523a",2);rr(917,373,14,18,3,"#9c4b28");line(934,373,941,368,"#76513b",3);
+}
+function drawPerson(x,y,emoji,scale=1){
+ ellipse(x,y+18*scale,23*scale,8*scale,"#3d302744");
+ ctx.font=`${40*scale}px serif`;ctx.textAlign="center";ctx.fillText(emoji,x,y+8*scale);
+}
+function drawCustomers(){
+ // seated diners at little tables
+ ellipse(784,475,65,17,"#45382c44");
+ poly([[728,435],[817,435],[847,457],[754,457]],"#bd8952","#68482f",3);
+ poly([[754,457],[847,457],[847,468],[754,468]],"#805636");
+ line(773,468,766,526,"#553c2b",7);line(829,468,836,526,"#553c2b",7);
+ drawPerson(768,415,"👩🏻‍🦰",.83);drawPerson(833,420,"👨🏽",.82);
+ // small soup bowls on table
+ ellipse(796,441,16,7,"#f4e5ca","#78563b");ellipse(796,439,12,5,"#d66d3c");
+ // counter customer
+ if(customersInScene.length)drawPerson(483,380,customersInScene[customersInScene.length-1].emoji,.95);
+}
+function drawSign(){
+ rr(380,222,242,75,8,"#4a3426","#c49b61",4);
+ text("NIGHT OWL",501,253,26,"#f7d99d","800 26px Fraunces");
+ text("SOUP · BREAD · GOOD COMPANY",501,276,10,"#f4e2c3","700 10px DM Sans");
+}
+function drawScene(){
+ ctx.clearRect(0,0,1000,675);drawBackground();drawSign();drawStove();drawCounter();drawCustomers();
+ // hanging decorative garlic and pepper
+ for(let i=0;i<3;i++){line(45+i*35,170,45+i*35,208,"#735039",2);ellipse(45+i*35,213,7,12,i%2?"#b84431":"#eee0c4")}
+ // moving particles
+ particles=particles.filter(p=>p.life>0);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.08;p.life--;ctx.globalAlpha=p.life/45;ellipse(p.x,p.y,p.size,p.size,p.color);ctx.globalAlpha=1});
+ // warm vignette
+ const vg=ctx.createRadialGradient(500,340,210,500,340,690);vg.addColorStop(0,"#0000");vg.addColorStop(1,"#2c1b142b");ctx.fillStyle=vg;ctx.fillRect(0,0,1000,675);
+}
+function loop(){ambient++;drawScene();requestAnimationFrame(loop)}
+function updateTimer(){
+ if(!active||!customer)return;
+ timeLeft-=.1;
+ const pct=Math.max(0,timeLeft/maxTime*100);$("timer").style.width=pct+"%";
+ $("timer").style.background=pct<30?"#bd4938":pct<60?"#d5a047":"#5d8758";
+ $("time-label").textContent=Math.max(0,Math.ceil(timeLeft))+" sn";
+ if(timeLeft<=0){
+  rep=Math.max(1,rep-.12);updateStats();log(`${customer.name} got tired of waiting and left the shop.`);
+  toast("Your guest got tired of waiting.");queueNo++;newCustomer();
+ }
+}
+function endDay(){
+ active=false;$("end-money").textContent="₺"+money;$("end-served").textContent=dayServed;$("end-rating").textContent=rep.toFixed(1);
+ $("end-overlay").classList.add("show");
+}
+$("next-day").addEventListener("click",()=>{
+ $("end-overlay").classList.remove("show");day++;dayServed=0;money+=100;active=true;timeLeft=25;queueNo=1;
+ log(`${day}. day has begun. The shop is open once again.`);updateStats();newCustomer();
+});
+setInterval(updateTimer,100);
+setInterval(()=>{if(active&&customer&&Math.random()<.12){/* gentle ambient guest movement */}},1500);
+setInterval(()=>{if(active&&dayServed>=8)endDay()},1000);
+updateStats();newCustomer();loop();
+})();
+</script>
 </body>
 </html>
