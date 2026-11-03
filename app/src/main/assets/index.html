@@ -201,61 +201,45 @@ function text(str,x,y,size,color="#4b3829",font="700 16px DM Sans",align="center
 function ellipse(x,y,rx,ry,fill,stroke=null){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke()}}
 function drawBackground(){
  const g=ctx.createLinearGradient(0,0,0,675);g.addColorStop(0,"#a9ad8a");g.addColorStop(.52,"#d3c49d");g.addColorStop(1,"#8e8065");ctx.fillStyle=g;ctx.fillRect(0,0,1000,675);
- // back wall
  poly([[0,0],[1000,0],[1000,420],[0,420]],"#c9b38d",null);
- // plaster texture
  for(let i=0;i<90;i++){let x=(i*137)%1000,y=(i*71)%400;ellipse(x,y, rnd(2,8),rnd(1,3),"#a88f6e22")}
- // upper beams
  ctx.fillStyle="#725039";ctx.fillRect(0,20,1000,13);ctx.fillRect(0,145,1000,8);
- // wall tiles
  for(let y=170;y<420;y+=42)for(let x=0;x<1000;x+=62){ctx.strokeStyle="#a98d6a";ctx.lineWidth=1;ctx.strokeRect(x,y,62,42)}
- // left window
  rr(34,45,235,117,8,"#4c5548","#60432e",9);rr(45,56,213,95,4,"#8d9b87","#d9c5a0",3);
  for(let i=0;i<5;i++){line(48+i*43,59,48+i*43,148,"#5b4835",5)}
  line(48,103,255,103,"#5b4835",5);
- // outside night
  ellipse(80,81,12,12,"#f4d58b");ellipse(211,78,5,5,"#fff0c4");
- // menu board
  rr(326,35,340,119,7,"#3b3025","#9a7046",5);
  text("TODAY’S SOUPS",496,62,17,"#f5d38d","800 17px Fraunces");
  line(350,74,645,74,"#98734b",1);
  text("Lentil · Ezogelin · Tripe",496,98,12,"#fff0d0","600 12px DM Sans");
  text("Yogurt · Tarhana · Head & Trotter",496,122,12,"#fff0d0","600 12px DM Sans");
- // wall shelf
  poly([[710,188],[965,188],[943,207],[690,207]],"#815b3c");
  ctx.fillStyle="#5c402c";ctx.fillRect(701,207,248,10);
  for(let i=0;i<5;i++){rr(718+i*43,151,29,38,5,["#a64c32","#d2a34e","#687a5d","#d9c7a5","#a64c32"][i],"#65442d",2);ellipse(732+i*43,151,14,5,"#e8d5b3")}
- // hanging lights
  for(let x of [345,825]){line(x,0,x,67,"#55402e",3);ellipse(x,74,18,7,"#f0c56e");ellipse(x,78,12,4,"#fff0b5")}
- // floor
  poly([[0,420],[1000,420],[1000,675],[0,675]],"#8f7456",null);
  for(let y=440;y<700;y+=43){line(0,y,1000,y,"#6e5a43",2)}
  for(let x=-200;x<1200;x+=110){line(x,420,x+170,675,"#6e5a43",2)}
- // rug
  poly([[300,496],[737,496],[864,635],[185,635]],"#a74b38","#633c2c",5);
  for(let i=0;i<4;i++)poly([[320+i*15,510+i*13],[716-i*15,510+i*13],[823-i*18,622-i*7],[226+i*18,622-i*7]],"rgba(0,0,0,0)","#d69b5c",2);
 }
 function drawStove(){
- // stove shadow and body
  ellipse(210,480,135,25,"#463a2e44");
  poly([[75,350],[315,350],[354,391],[110,391]],"#6c5540");
  poly([[110,391],[354,391],[354,501],[110,501]],"#6b4b35");
  poly([[75,350],[110,391],[110,501],[75,462]],"#8c6544");
  for(let i=0;i<3;i++){rr(130+i*69,410,53,72,5,"#4a382c","#33281f",4);ellipse(156+i*69,411,22,7,"#a8a08b");}
- // copper pots
  drawPot(139,342,74,60,"#b56d3f","#e8a66a","mercimek");
  drawPot(236,342,74,60,"#9d5638","#dc8651","ezogelin");
- // steam
  for(let p of steam){p.y-=.7;p.x+=Math.sin(p.y/12)*.25;p.life--;ctx.globalAlpha=Math.max(0,p.life/55)*.35;ellipse(p.x,p.y,5,9,"#fff8e8");ctx.globalAlpha=1}
  if(steam.length<30)steam.push({x:rnd(139,310),y:rnd(300,335),life:55});
 }
 function drawPot(x,y,w,h,metal,liquid,type){
- // handles and body
  ctx.fillStyle=metal;ctx.strokeStyle="#65442f";ctx.lineWidth=3;
  ctx.beginPath();ctx.ellipse(x+w/2,y+h*.22,w/2,h*.23,0,0,Math.PI*2);ctx.fill();ctx.stroke();
  ctx.fillStyle=metal;ctx.beginPath();ctx.moveTo(x,y+h*.2);ctx.lineTo(x+7,y+h*.85);ctx.quadraticCurveTo(x+w/2,y+h+8,x+w-7,y+h*.85);ctx.lineTo(x+w,y+h*.2);ctx.closePath();ctx.fill();ctx.stroke();
  ctx.beginPath();ctx.ellipse(x+w/2,y+h*.22,w/2-5,h*.18,0,0,Math.PI*2);ctx.fillStyle=liquid;ctx.fill();ctx.strokeStyle="#f4c38a";ctx.stroke();
- // visible soup identity
  if(type==="mercimek"){
   for(let i=0;i<10;i++)ellipse(x+12+(i*19)%52,y+8+(i*7)%14,2.5,2,"#f6d276");
   line(x+25,y+10,x+50,y+20,"#a84d2d",3);
@@ -266,36 +250,46 @@ function drawPot(x,y,w,h,metal,liquid,type){
  rr(x-7,y+16,8,18,3,metal,"#65442f");rr(x+w-1,y+16,8,18,3,metal,"#65442f");
 }
 function drawCounter(){
- // counter back and top
  poly([[420,357],[850,357],[964,425],[535,425]],"#9d6d48","#5c402d",4);
  poly([[535,425],[964,425],[964,548],[535,548]],"#6c4932","#4d3528",4);
  poly([[420,357],[535,425],[535,548],[420,482]],"#815a3d","#4d3528",4);
- // front panels
  for(let i=0;i<4;i++){poly([[552+i*99,444],[638+i*99,444],[638+i*99,527],[552+i*99,527]],"#8e6241","#523b2d",2);line(562+i*99,454,628+i*99,454,"#bd8b5e",2)}
- // counter top items
  rr(574,364,94,31,5,"#f1e4c9","#72523a",2);text("PICKLES",621,384,11,"#684b35","800 11px DM Sans");
- // bread basket
  ellipse(765,394,42,15,"#68452e");ellipse(765,388,40,14,"#d8a45d","#82552f");
  for(let i=0;i<5;i++){ctx.save();ctx.translate(738+i*13,385+(i%2)*-5);ctx.rotate(-.25+i*.12);rr(-9,-7,21,11,6,"#dba85e","#a66b36",1);line(-4,-5,4,-4,"#f5d18b",1);ctx.restore()}
- // lemon plate
  ellipse(866,399,29,10,"#d8b77a");for(let i=0;i<3;i++){ctx.save();ctx.translate(851+i*14,393);ctx.rotate(-.5);ellipse(0,0,9,5,"#f5d45e","#bd9a3d");ctx.restore()}
- // glass tea
  rr(914,365,20,30,4,"#b8d1c1aa","#75523a",2);rr(917,373,14,18,3,"#9c4b28");line(934,373,941,368,"#76513b",3);
+
+ // EKSTRA: Tezgahın üzerine ekstra sıcak çorba kaseleri ekledik (Görsel zenginlik için)
+ ellipse(470, 390, 14, 6, "#f4e5ca", "#78563b"); ellipse(470, 388, 10, 4, "#d66d3c");
+ ellipse(510, 375, 14, 6, "#f4e5ca", "#78563b"); ellipse(510, 373, 10, 4, "#e9a52d");
 }
 function drawPerson(x,y,emoji,scale=1){
  ellipse(x,y+18*scale,23*scale,8*scale,"#3d302744");
  ctx.font=`${40*scale}px serif`;ctx.textAlign="center";ctx.fillText(emoji,x,y+8*scale);
 }
 function drawCustomers(){
- // seated diners at little tables
+ // 1. Masa (Sol taraf arka)
+ ellipse(620, 475, 55, 15, "#45382c44");
+ poly([[580, 440],[655, 440],[675, 458],[600, 458]],"#bd8952","#68482f",3);
+ drawPerson(595, 415, "👵🏻", .75); drawPerson(640, 418, "👴🏻", .75);
+ ellipse(618, 445, 12, 5, "#f4e5ca", "#78563b"); ellipse(618, 443, 8, 3, "#bd4c2e"); // Çorba kasesi
+
+ // 2. Masa (Sağ taraf - Orijinal masa)
  ellipse(784,475,65,17,"#45382c44");
  poly([[728,435],[817,435],[847,457],[754,457]],"#bd8952","#68482f",3);
  poly([[754,457],[847,457],[847,468],[754,468]],"#805636");
  line(773,468,766,526,"#553c2b",7);line(829,468,836,526,"#553c2b",7);
  drawPerson(768,415,"👩🏻‍🦰",.83);drawPerson(833,420,"👨🏽",.82);
- // small soup bowls on table
  ellipse(796,441,16,7,"#f4e5ca","#78563b");ellipse(796,439,12,5,"#d66d3c");
- // counter customer
+
+ // 3. Masa (Ön sol - Ekstra kalabalık müşteri)
+ ellipse(390, 560, 65, 17, "#45382c44");
+ poly([[334, 520],[423, 520],[453, 542],[360, 542]],"#bd8952","#68482f",3);
+ drawPerson(365, 500, "🧑🏻‍🎓", .82); drawPerson(420, 502, "👩🏻", .82);
+ ellipse(395, 527, 14, 6, "#f4e5ca", "#78563b"); ellipse(395, 525, 10, 4, "#e8d8b4"); // Çorba kasesi
+
+ // Sayaç/Tezgah başındaki aktif müşteri
  if(customersInScene.length)drawPerson(483,380,customersInScene[customersInScene.length-1].emoji,.95);
 }
 function drawSign(){
@@ -305,11 +299,8 @@ function drawSign(){
 }
 function drawScene(){
  ctx.clearRect(0,0,1000,675);drawBackground();drawSign();drawStove();drawCounter();drawCustomers();
- // hanging decorative garlic and pepper
  for(let i=0;i<3;i++){line(45+i*35,170,45+i*35,208,"#735039",2);ellipse(45+i*35,213,7,12,i%2?"#b84431":"#eee0c4")}
- // moving particles
  particles=particles.filter(p=>p.life>0);particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.08;p.life--;ctx.globalAlpha=p.life/45;ellipse(p.x,p.y,p.size,p.size,p.color);ctx.globalAlpha=1});
- // warm vignette
  const vg=ctx.createRadialGradient(500,340,210,500,340,690);vg.addColorStop(0,"#0000");vg.addColorStop(1,"#2c1b142b");ctx.fillStyle=vg;ctx.fillRect(0,0,1000,675);
 }
 function loop(){ambient++;drawScene();requestAnimationFrame(loop)}
@@ -333,7 +324,7 @@ $("next-day").addEventListener("click",()=>{
  log(`${day}. day has begun. The shop is open once again.`);updateStats();newCustomer();
 });
 setInterval(updateTimer,100);
-setInterval(()=>{if(active&&customer&&Math.random()<.12){/* gentle ambient guest movement */}},1500);
+setInterval(()=>{if(active&&customer&&Math.random()<.12){}},1500);
 setInterval(()=>{if(active&&dayServed>=8)endDay()},1000);
 updateStats();newCustomer();loop();
 })();
