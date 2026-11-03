@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sanguinary Chef - Real Recipe Challenge</title>
+    <title>The Soup House - Diner Management</title>
     <style>
         :root {
-            --bg-color: #0a0a0c;
-            --panel-bg: #141419;
-            --primary-red: #8b0000;
-            --accent-red: #d60000;
-            --gold-accent: #ffd700;
-            --text-color: #e0e0e0;
+            --bg-color: #1c130e;
+            --floor-color: #2c1d14;
+            --counter-color: #5c3a21;
+            --accent-gold: #ffb703;
+            --text-color: #f1faee;
+            --red-alert: #e63946;
+            --green-good: #2a9d8f;
         }
 
         body {
-            font-family: 'Georgia', serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 15px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -28,293 +29,369 @@
 
         header {
             text-align: center;
-            border-bottom: 2px solid var(--primary-red);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            width: 100%;
+            margin-bottom: 8px;
         }
 
         h1 {
-            color: var(--gold-accent);
+            color: var(--accent-gold);
             margin: 0;
-            font-size: 24px;
-            letter-spacing: 2px;
+            font-size: 22px;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .subtitle {
-            color: var(--accent-red);
-            font-size: 14px;
-            margin-top: 5px;
-            font-style: italic;
-        }
-
-        .stats-board {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            background-color: var(--panel-bg);
-            border: 1px solid var(--primary-red);
-            border-radius: 8px;
-            padding: 10px 0;
-            margin-bottom: 15px;
-            box-shadow: 0 0 10px rgba(139, 0, 0, 0.4);
-        }
-
-        .stat-box {
-            text-align: center;
-        }
-
-        .stat-label {
             font-size: 12px;
-            color: #aaaaaa;
-            text-transform: uppercase;
+            color: #d3d3d3;
         }
 
-        .stat-value {
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--gold-accent);
-        }
-
-        .order-card {
-            background-color: var(--panel-bg);
-            border: 2px solid var(--gold-accent);
-            border-radius: 10px;
-            padding: 15px;
-            width: 90%;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .order-title {
-            color: var(--accent-red);
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .ingredient-list {
+        .stats-bar {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-
-        .btn-ingredient {
-            background-color: #22222a;
-            color: var(--text-color);
-            border: 1px solid var(--primary-red);
-            padding: 10px 14px;
-            border-radius: 6px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-ingredient:active {
-            transform: scale(0.95);
-            background-color: var(--primary-red);
-        }
-
-        .actions {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
+            justify-content: space-between;
             width: 100%;
-        }
-
-        .btn-action {
-            background-color: var(--primary-red);
-            color: var(--gold-accent);
-            border: 1px solid var(--gold-accent);
-            padding: 12px 25px;
+            max-width: 480px;
+            background: #3a2518;
+            padding: 8px 15px;
             border-radius: 8px;
+            border: 2px solid var(--accent-gold);
+            box-sizing: border-box;
+            margin-bottom: 10px;
             font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            width: 45%;
         }
 
-        .btn-clear {
-            background-color: #333333;
-            color: #ffffff;
-            border: 1px solid #555555;
+        /* Game Layout Area */
+        #game-container {
+            width: 100%;
+            max-width: 480px;
+            height: 380px;
+            background-color: var(--floor-color);
+            border: 3px solid var(--counter-color);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+        }
+
+        /* Kitchen / Counter Zone */
+        .kitchen-counter {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background-color: var(--counter-color);
+            border-bottom: 4px solid var(--accent-gold);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        .soup-pot {
+            background: #444;
+            border: 2px solid #888;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 10px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: inset 0 0 8px #000;
+            transition: transform 0.1s;
+        }
+
+        .soup-pot:active {
+            transform: scale(0.9);
+        }
+
+        .soup-pot.lentil { background: #e9c46a; color: #000; }
+        .soup-pot.iskembe { background: #f4f1de; color: #000; }
+        .soup-pot.beyran { background: #e63946; color: #fff; }
+        .soup-pot.ezogelin { background: #f4a261; color: #000; }
+
+        /* Dining Area Tables */
+        .dining-area {
+            position: absolute;
+            top: 90px;
+            width: 100%;
+            height: 280px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 15px;
+            padding: 10px 20px;
+            box-sizing: border-box;
+        }
+
+        .table-spot {
+            background: #4a3121;
+            border: 3px solid #6b472f;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        }
+
+        .table-label {
+            font-size: 11px;
+            color: #ccc;
+            position: absolute;
+            bottom: 5px;
+        }
+
+        /* Customer & Order Bubble */
+        .customer {
+            font-size: 32px;
+            animation: bounce 1s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-4px); }
+        }
+
+        .order-bubble {
+            position: absolute;
+            top: -25px;
+            background: white;
+            color: black;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+            border: 2px solid var(--accent-gold);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            white-space: nowrap;
+        }
+
+        /* Chef / Waiter Hands Indicator */
+        .holding-box {
+            margin-top: 10px;
+            width: 100%;
+            max-width: 480px;
+            background: #25170f;
+            border: 1px dashed var(--accent-gold);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .holding-title {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 4px;
+        }
+
+        .holding-item {
+            font-size: 16px;
+            color: var(--accent-gold);
+            font-weight: bold;
         }
 
         #feedback {
-            margin-top: 15px;
-            font-size: 16px;
+            margin-top: 8px;
+            height: 20px;
             font-weight: bold;
-            height: 24px;
-            text-align: center;
-        }
-
-        .selected-box {
-            background: #1a0000;
-            border: 1px dashed var(--primary-red);
-            padding: 8px;
-            border-radius: 6px;
-            min-height: 20px;
-            margin-bottom: 15px;
-            font-size: 13px;
-            color: var(--gold-accent);
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Sanguinary Chef</h1>
-        <div class="subtitle">Gothic Gastronomy - Real Recipe Challenge</div>
+        <h1>The Soup House</h1>
+        <div class="subtitle">Traditional Turkish Soup Diner Management</div>
     </header>
 
-    <div class="stats-board">
-        <div class="stat-box">
-            <div class="stat-label">Score</div>
-            <div class="stat-value" id="score">0</div>
+    <div class="stats-bar">
+        <span>Score: <span id="score" style="color: var(--accent-gold);">0</span></span>
+        <span>Time: <span id="timer" style="color: #ff6b6b;">60s</span></span>
+    </div>
+
+    <div id="game-container">
+        <!-- Kitchen Pots -->
+        <div class="kitchen-counter">
+            <div class="soup-pot lentil" onclick="cookSoup('Lentil Soup')">
+                🥣<span>Lentil</span>
+            </div>
+            <div class="soup-pot iskembe" onclick="cookSoup('Iskembe Soup')">
+                🥣<span>Iskembe</span>
+            </div>
+            <div class="soup-pot beyran" onclick="cookSoup('Beyran Soup')">
+                🥣<span>Beyran</span>
+            </div>
+            <div class="soup-pot ezogelin" onclick="cookSoup('Ezogelin')">
+                🥣<span>Ezogelin</span>
+            </div>
         </div>
-        <div class="stat-box">
-            <div class="stat-label">Time Left</div>
-            <div class="stat-value" id="timer">60s</div>
+
+        <!-- Dining Tables -->
+        <div class="dining-area">
+            <div class="table-spot" id="table-0" onclick="serveTable(0)">
+                <span class="table-label">Table 1</span>
+            </div>
+            <div class="table-spot" id="table-1" onclick="serveTable(1)">
+                <span class="table-label">Table 2</span>
+            </div>
+            <div class="table-spot" id="table-2" onclick="serveTable(2)">
+                <span class="table-label">Table 3</span>
+            </div>
+            <div class="table-spot" id="table-3" onclick="serveTable(3)">
+                <span class="table-label">Table 4</span>
+            </div>
         </div>
     </div>
 
-    <div class="order-card">
-        <div class="stat-label">Target Dish</div>
-        <div class="order-title" id="dish-name">Loading Dish...</div>
-        <div style="font-size: 12px; color: #888; margin-bottom: 8px;">Select Required Ingredients:</div>
-        <div class="selected-box" id="selected-ingredients">None</div>
-    </div>
-
-    <div class="ingredient-list" id="ingredient-buttons">
-        <!-- Ingredients will be generated by JS -->
-    </div>
-
-    <div class="actions">
-        <button class="btn-action btn-clear" onclick="clearSelection()">Reset</button>
-        <button class="btn-action" onclick="serveDish()">Serve Dish</button>
+    <div class="holding-box">
+        <div class="holding-title">Chef Carrying:</div>
+        <div class="holding-item" id="carrying-display">Empty Hands</div>
     </div>
 
     <div id="feedback"></div>
 
     <script>
-        // Real Culinary Recipes with Gothic Themed Names
-        const recipes = [
-            { 
-                name: "Sanguine Steak Tartare", 
-                required: ["Beef Tenderloin", "Egg Yolk", "Capers", "Dijon Mustard"] 
-            },
-            { 
-                name: "Blackened Angel Wings", 
-                required: ["Chicken Wings", "Smoked Paprika", "Cayenne Pepper", "Garlic Powder"] 
-            },
-            { 
-                name: "Blood Orange Sangria", 
-                required: ["Red Wine", "Blood Orange Juice", "Cinnamon", "Brandy"] 
-            },
-            { 
-                name: "Gothic Truffle Risotto", 
-                required: ["Arborio Rice", "Black Truffle", "Parmesan Cheese", "Chicken Stock"] 
-            }
-        ];
+        const soupTypes = ["Lentil Soup", "Iskembe Soup", "Beyran Soup", "Ezogelin"];
+        const customerEmojis = ["🧔🏻‍♂️", "👨🏽", "🧕🏼", "👵🏻", "👨🏻‍🍳"];
 
-        // Combined Real Ingredients Pool
-        const allIngredients = [
-            "Beef Tenderloin", "Egg Yolk", "Capers", "Dijon Mustard",
-            "Chicken Wings", "Smoked Paprika", "Cayenne Pepper", "Garlic Powder",
-            "Red Wine", "Blood Orange Juice", "Cinnamon", "Brandy",
-            "Arborio Rice", "Black Truffle", "Parmesan Cheese", "Chicken Stock"
-        ];
-
-        let currentRecipe = {};
-        let selected = [];
+        let carriedSoup = null;
         let score = 0;
         let timeLeft = 60;
-        let timerInterval;
+        let gameTimer = null;
+        let customerSpawner = null;
 
-        function initGame() {
+        // Table states: null or { customer: emoji, order: soupType }
+        let tables = [null, null, null, null];
+
+        function startGame() {
             score = 0;
             timeLeft = 60;
-            document.getElementById("score").innerText = score;
-            document.getElementById("timer").innerText = timeLeft + "s";
-            startTimer();
-            nextRecipe();
-            renderIngredients();
-        }
+            carriedSoup = null;
+            tables = [null, null, null, null];
+            updateCarryingUI();
+            updateScoreUI();
+            renderTables();
 
-        function startTimer() {
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
+            clearInterval(gameTimer);
+            clearInterval(customerSpawner);
+
+            gameTimer = setInterval(() => {
                 timeLeft--;
                 document.getElementById("timer").innerText = timeLeft + "s";
                 if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    alert("Time's Up! Your Final Banquet Score: " + score);
-                    initGame();
+                    endGame();
                 }
             }, 1000);
+
+            // Spawn customer every 2.5 seconds
+            customerSpawner = setInterval(spawnCustomer, 2500);
+            spawnCustomer(); // Immediate first spawn
         }
 
-        function nextRecipe() {
-            selected = [];
-            updateSelectedUI();
-            const randomIndex = Math.floor(Math.random() * recipes.length);
-            currentRecipe = recipes[randomIndex];
-            document.getElementById("dish-name").innerText = currentRecipe.name;
+        function spawnCustomer() {
+            let emptyIndices = [];
+            tables.forEach((t, idx) => {
+                if (t === null) emptyIndices.push(idx);
+            });
+
+            if (emptyIndices.length > 0) {
+                let randomTable = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+                let randomCustomer = customerEmojis[Math.floor(Math.random() * customerEmojis.length)];
+                let randomOrder = soupTypes[Math.floor(Math.random() * soupTypes.length)];
+
+                tables[randomTable] = {
+                    customer: randomCustomer,
+                    order: randomOrder
+                };
+                renderTables();
+            }
         }
 
-        function renderIngredients() {
-            const container = document.getElementById("ingredient-buttons");
-            container.innerHTML = "";
-            allIngredients.forEach(ing => {
-                const btn = document.createElement("button");
-                btn.className = "btn-ingredient";
-                btn.innerText = ing;
-                btn.onclick = () => selectIngredient(ing);
-                container.appendChild(btn);
+        function cookSoup(soupName) {
+            carriedSoup = soupName;
+            updateCarryingUI();
+            showFeedback("Picked up " + soupName, "#ffb703");
+        }
+
+        function serveTable(tableIndex) {
+            let table = tables[tableIndex];
+
+            if (!table) {
+                showFeedback("Table is empty!", "#aaa");
+                return;
+            }
+
+            if (!carriedSoup) {
+                showFeedback("Pick a soup from counter first!", "#ff6b6b");
+                return;
+            }
+
+            if (carriedSoup === table.order) {
+                score += 10;
+                showFeedback("+10 Correct Soup Served!", "#2a9d8f");
+                tables[tableIndex] = null; // Customer leaves satisfied
+                carriedSoup = null;
+            } else {
+                score = Math.max(0, score - 5);
+                showFeedback("-5 Wrong Order Served!", "#e63946");
+                carriedSoup = null;
+            }
+
+            updateScoreUI();
+            updateCarryingUI();
+            renderTables();
+        }
+
+        function renderTables() {
+            tables.forEach((t, idx) => {
+                let el = document.getElementById("table-" + idx);
+                if (t) {
+                    el.innerHTML = `
+                        <div class="order-bubble">Want: ${t.order}</div>
+                        <div class="customer">${t.customer}</div>
+                        <span class="table-label">Table ${idx + 1}</span>
+                    `;
+                } else {
+                    el.innerHTML = `<span class="table-label">Table ${idx + 1} (Empty)</span>`;
+                }
             });
         }
 
-        function selectIngredient(ing) {
-            if (!selected.includes(ing)) {
-                selected.push(ing);
-                updateSelectedUI();
-            }
+        function updateCarryingUI() {
+            let display = document.getElementById("carrying-display");
+            display.innerText = carriedSoup ? "🥣 " + carriedSoup : "Empty Hands";
         }
 
-        function clearSelection() {
-            selected = [];
-            updateSelectedUI();
-        }
-
-        function updateSelectedUI() {
-            const box = document.getElementById("selected-ingredients");
-            box.innerText = selected.length > 0 ? selected.join(" + ") : "None";
-        }
-
-        function serveDish() {
-            const feedback = document.getElementById("feedback");
-            const isCorrect = currentRecipe.required.length === selected.length &&
-                currentRecipe.required.every(val => selected.includes(val));
-
-            if (isCorrect) {
-                score += 10;
-                feedback.style.color = "#00ff00";
-                feedback.innerText = "+10 Perfect Recipe Prepared!";
-            } else {
-                score = Math.max(0, score - 5);
-                feedback.style.color = "#ff3333";
-                feedback.innerText = "-5 Ruined Dish!";
-            }
-
+        function updateScoreUI() {
             document.getElementById("score").innerText = score;
-            setTimeout(() => { feedback.innerText = ""; }, 1500);
-            nextRecipe();
         }
 
-        window.onload = initGame;
+        function showFeedback(msg, color) {
+            let fb = document.getElementById("feedback");
+            fb.innerText = msg;
+            fb.style.color = color;
+            setTimeout(() => {
+                if (fb.innerText === msg) fb.innerText = "";
+            }, 1500);
+        }
+
+        function endGame() {
+            clearInterval(gameTimer);
+            clearInterval(customerSpawner);
+            alert("Shift Ended! Total Soup House Revenue/Score: " + score);
+            startGame();
+        }
+
+        window.onload = startGame;
     </script>
 </body>
 </html>
