@@ -3,294 +3,329 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Soup House - 2D Diner Management</title>
+    <title>The Soup House - Pro Landscape Diner</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background-color: #120b08;
-            color: #fff;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #0c0705;
+            color: #f8f9fa;
+            font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            user-select: none;
+            height: 100vh;
+            width: 100vw;
             overflow: hidden;
+            user-select: none;
         }
 
-        #game-header {
-            width: 100%;
-            max-width: 480px;
-            background: #2b1810;
+        #hud-bar {
+            width: 800px;
+            background: linear-gradient(180deg, #3a2012 0%, #201109 100%);
             border: 2px solid #d4af37;
-            padding: 8px 15px;
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+            padding: 8px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-radius: 8px 8px 0 0;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.6);
         }
 
-        .title { color: #d4af37; font-weight: bold; font-size: 16px; letter-spacing: 1px; }
-        .stats { font-size: 14px; font-weight: bold; display: flex; gap: 15px; }
-        .score-val { color: #4eff7b; }
-        .timer-val { color: #ff5252; }
+        .brand {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffb703;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        .stats-group {
+            display: flex;
+            gap: 25px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .stat-item {
+            background: rgba(0,0,0,0.4);
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: 1px solid #5c3a21;
+        }
+
+        .stat-score { color: #52b788; }
+        .stat-time { color: #e63946; }
+        .stat-holding { color: #ffb703; }
 
         canvas {
-            background-color: #1a0f0a;
-            border: 2px solid #d4af37;
-            border-top: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            background: #180d08;
+            border: 3px solid #d4af37;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.9);
             cursor: pointer;
         }
 
-        #instruction-bar {
-            width: 100%;
-            max-width: 480px;
-            background: #2b1810;
-            color: #d4af37;
-            text-align: center;
-            padding: 6px;
+        #footer-hints {
+            margin-top: 6px;
             font-size: 12px;
-            border-radius: 0 0 8px 8px;
-            border: 1px solid #d4af37;
-            margin-top: 4px;
+            color: #a8a29e;
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
 <body>
 
-    <div id="game-header">
-        <div class="title">THE SOUP HOUSE</div>
-        <div class="stats">
-            <div>SCORE: $<span id="score" class="score-val">0</span></div>
-            <div>TIME: <span id="timer" class="timer-val">60</span>s</div>
+    <div id="hud-bar">
+        <div class="brand">THE SOUP HOUSE</div>
+        <div class="stats-group">
+            <div class="stat-item">EARNINGS: $<span id="score" class="stat-score">0</span></div>
+            <div class="stat-item">TIME: <span id="timer" class="stat-time">60</span>s</div>
+            <div class="stat-item">CARRYING: <span id="holding" class="stat-holding">EMPTY</span></div>
         </div>
     </div>
 
-    <canvas id="canvas" width="480" height="520"></canvas>
+    <canvas id="gameCanvas" width="800" height="450"></canvas>
 
-    <div id="instruction-bar">
-        1. Click waiting customer to seat at table | 2. Click counter to get soup | 3. Serve table!
+    <div id="footer-hints">
+        💡 <b>How to Play:</b> Click queue to seat customers ➔ Click pots to pick soup ➔ Click table to serve!
     </div>
 
     <script>
-        const canvas = document.getElementById("canvas");
+        const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
 
-        // Game Variables
+        // Game State
         let score = 0;
         let timeLeft = 60;
-        let gameActive = true;
+        let isGameActive = true;
 
-        // Chef (Player) State
+        // Chef (Player) Object
         const chef = {
-            x: 240,
-            y: 120,
-            targetX: 240,
-            targetY: 120,
-            speed: 4,
-            holding: null // 'Lentil', 'Iskembe', 'Beyran', 'Ezogelin'
+            x: 400,
+            y: 180,
+            targetX: 400,
+            targetY: 180,
+            speed: 0.12,
+            holding: null,
+            facing: 'right'
         };
 
-        // Kitchen Counter Soups
+        // Soups Configuration
         const soups = [
-            { id: 'Lentil', name: 'Lentil Soup', color: '#e9c46a', x: 80, y: 50 },
-            { id: 'Iskembe', name: 'Iskembe Soup', color: '#f4f1de', x: 180, y: 50 },
-            { id: 'Beyran', name: 'Beyran Soup', color: '#e63946', x: 280, y: 50 },
-            { id: 'Ezogelin', name: 'Ezogelin Soup', color: '#f4a261', x: 380, y: 50 }
+            { id: 'Lentil', name: 'Lentil Soup', mainColor: '#e9c46a', oilColor: '#e63946', x: 260, y: 55 },
+            { id: 'Iskembe', name: 'İşkembe', mainColor: '#f4f1de', oilColor: '#e63946', x: 350, y: 55 },
+            { id: 'Beyran', name: 'Beyran', mainColor: '#d62828', oilColor: '#ffb703', x: 440, y: 55 },
+            { id: 'Ezogelin', name: 'Ezogelin', mainColor: '#f4a261', oilColor: '#d62828', x: 530, y: 55 }
         ];
 
-        // Tables Configuration
+        // Tables Layout (Landscape 6 Tables)
         const tables = [
-            { id: 1, x: 120, y: 220, state: 'empty', customer: null, order: null, timer: 0 },
-            { id: 2, x: 360, y: 220, state: 'empty', customer: null, order: null, timer: 0 },
-            { id: 3, x: 120, y: 380, state: 'empty', customer: null, order: null, timer: 0 },
-            { id: 4, x: 360, y: 380, state: 'empty', customer: null, order: null, timer: 0 }
+            { id: 1, x: 180, y: 200, status: 'empty', customer: null, order: null, eatTimer: 0 },
+            { id: 2, x: 400, y: 200, status: 'empty', customer: null, order: null, eatTimer: 0 },
+            { id: 3, x: 620, y: 200, status: 'empty', customer: null, order: null, eatTimer: 0 },
+            { id: 4, x: 180, y: 350, status: 'empty', customer: null, order: null, eatTimer: 0 },
+            { id: 5, x: 400, y: 350, status: 'empty', customer: null, order: null, eatTimer: 0 },
+            { id: 6, x: 620, y: 350, status: 'empty', customer: null, order: null, eatTimer: 0 }
         ];
 
-        // Waiting Line (Entrance)
-        let waitingQueue = [];
-        const maxQueue = 3;
+        // Customer Queue
+        let queue = [];
+        const maxQueue = 4;
+        const customerColors = ['#2a9d8f', '#e76f51', '#457b9d', '#9b5de5', '#f4a261'];
 
-        // Customer Colors for visual variety
-        const customerShirtColors = ['#457b9d', '#2a9d8f', '#e76f51', '#9b5de5', '#f15bb5'];
-
-        // Spawning System
+        // Customer Spawner
         setInterval(() => {
-            if (gameActive && waitingQueue.length < maxQueue) {
+            if (isGameActive && queue.length < maxQueue) {
                 const randomSoup = soups[Math.floor(Math.random() * soups.length)].id;
-                const randomColor = customerShirtColors[Math.floor(Math.random() * customerShirtColors.length)];
-                waitingQueue.push({
+                const randomColor = customerColors[Math.floor(Math.random() * customerColors.length)];
+                queue.push({
                     id: Date.now(),
                     color: randomColor,
                     order: randomSoup
                 });
             }
-        }, 3500);
+        }, 3000);
 
-        // Timer Decrement
-        const timerInterval = setInterval(() => {
-            if (gameActive) {
+        // Timer Loop
+        const timerObj = setInterval(() => {
+            if (isGameActive) {
                 timeLeft--;
                 document.getElementById("timer").innerText = timeLeft;
                 if (timeLeft <= 0) {
-                    gameActive = false;
-                    clearInterval(timerInterval);
-                    setTimeout(() => alert("Time is up! Final Score: $" + score), 100);
+                    isGameActive = false;
+                    clearInterval(timerObj);
+                    setTimeout(() => alert("Shift Finished! Total Earnings: $" + score), 100);
                 }
             }
         }, 1000);
 
-        // Input Listener
+        // Interaction Listener
         canvas.addEventListener("click", (e) => {
-            if (!gameActive) return;
+            if (!isGameActive) return;
 
             const rect = canvas.getBoundingClientRect();
-            const mx = e.clientX - rect.left;
-            const my = e.clientY - rect.top;
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
 
-            // 1. Clicked Kitchen Counter (Pick Soup)
+            // 1. Kitchen Counter Pots Click
             soups.forEach(soup => {
-                if (Math.hypot(mx - soup.x, my - soup.y) < 30) {
+                if (Math.hypot(clickX - soup.x, clickY - soup.y) < 32) {
                     chef.targetX = soup.x;
-                    chef.targetY = soup.y + 40;
+                    chef.targetY = soup.y + 55;
                     chef.holding = soup.id;
+                    updateHUD();
                 }
             });
 
-            // 2. Clicked Waiting Customer Area (Seat Customer)
-            if (mx < 80 && my > 120 && my < 250 && waitingQueue.length > 0) {
-                let emptyTable = tables.find(t => t.state === 'empty');
-                if (emptyTable) {
-                    let cust = waitingQueue.shift();
-                    emptyTable.state = 'waiting_order';
-                    emptyTable.customer = cust;
-                    emptyTable.order = cust.order;
+            // 2. Queue Click (Seat Customer)
+            if (clickX < 80 && clickY > 100 && clickY < 380 && queue.length > 0) {
+                let freeTable = tables.find(t => t.status === 'empty');
+                if (freeTable) {
+                    let cust = queue.shift();
+                    freeTable.status = 'waiting';
+                    freeTable.customer = cust;
+                    freeTable.order = cust.order;
                 }
             }
 
-            // 3. Clicked Table
+            // 3. Table Click (Serve)
             tables.forEach(table => {
-                if (Math.hypot(mx - table.x, my - table.y) < 45) {
+                if (Math.hypot(clickX - table.x, clickY - table.y) < 50) {
                     chef.targetX = table.x;
-                    chef.targetY = table.y + 50;
+                    chef.targetY = table.y + 40;
 
-                    // Serve Soup
-                    if (table.state === 'waiting_order' && chef.holding) {
+                    if (table.status === 'waiting' && chef.holding) {
                         if (chef.holding === table.order) {
-                            score += 15;
-                            table.state = 'eating';
-                            table.timer = 180; // Eating duration in frames
+                            score += 20;
+                            table.status = 'eating';
+                            table.eatTimer = 200;
                             chef.holding = null;
                         } else {
                             score = Math.max(0, score - 5);
-                            chef.holding = null; // Wrong soup discarded
+                            chef.holding = null;
                         }
-                        document.getElementById("score").innerText = score;
+                        updateHUD();
                     }
                 }
             });
         });
 
-        // --- DRAWING FUNCTIONS (2D GRAPHICS) ---
+        function updateHUD() {
+            document.getElementById("score").innerText = score;
+            document.getElementById("holding").innerText = chef.holding ? chef.holding : "EMPTY";
+        }
 
-        function drawBackground() {
-            // Wood floor texture / tiles
-            ctx.fillStyle = "#26150c";
+        // --- RENDER ENGINE ---
+
+        function drawFloor() {
+            // Dark Wood Floor
+            ctx.fillStyle = "#20120b";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Floor Grid Lines
-            ctx.strokeStyle = "#1b0d07";
+            // Wood Planks
+            ctx.strokeStyle = "#140b06";
             ctx.lineWidth = 2;
-            for (let i = 0; i < canvas.width; i += 40) {
-                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
-            }
-            for (let j = 0; j < canvas.height; j += 40) {
-                ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(canvas.width, j); ctx.stroke();
+            for (let y = 100; y < canvas.height; y += 35) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
             }
 
             // Kitchen Bar Area
-            ctx.fillStyle = "#4a2818";
+            ctx.fillStyle = "#3d2214";
             ctx.fillRect(0, 0, canvas.width, 100);
-            ctx.fillStyle = "#633722";
-            ctx.fillRect(0, 90, canvas.width, 10);
+            ctx.fillStyle = "#5c341e";
+            ctx.fillRect(0, 92, canvas.width, 8);
 
-            // Entrance Mat (Red Carpet for queue)
-            ctx.fillStyle = "#8b0000";
-            ctx.fillRect(10, 140, 60, 120);
-            ctx.strokeStyle = "#ffd700";
-            ctx.strokeRect(10, 140, 60, 120);
-            ctx.fillStyle = "#fff";
-            ctx.font = "10px Arial";
-            ctx.fillText("ENTRANCE", 12, 135);
+            // Red Carpet Waiting Zone
+            ctx.fillStyle = "#6b0f1a";
+            ctx.fillRect(10, 120, 55, 280);
+            ctx.strokeStyle = "#d4af37";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(10, 120, 55, 280);
+
+            ctx.fillStyle = "#d4af37";
+            ctx.font = "bold 10px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("WAITING", 37, 112);
         }
 
         function drawPots() {
             soups.forEach(soup => {
-                // Pot Body
+                // Copper Pot
                 ctx.beginPath();
-                ctx.arc(soup.x, soup.y, 22, 0, Math.PI * 2);
-                ctx.fillStyle = "#555";
+                ctx.arc(soup.x, soup.y, 25, 0, Math.PI * 2);
+                ctx.fillStyle = "#b85d19";
                 ctx.fill();
-                ctx.strokeStyle = "#222";
+                ctx.strokeStyle = "#5a2a08";
                 ctx.lineWidth = 3;
                 ctx.stroke();
 
-                // Soup Liquid
+                // Liquid
                 ctx.beginPath();
-                ctx.arc(soup.x, soup.y, 16, 0, Math.PI * 2);
-                ctx.fillStyle = soup.color;
+                ctx.arc(soup.x, soup.y, 18, 0, Math.PI * 2);
+                ctx.fillStyle = soup.mainColor;
                 ctx.fill();
 
-                // Soup Label
-                ctx.fillStyle = "#fff";
+                // Butter Oil Swirl
+                ctx.beginPath();
+                ctx.arc(soup.x - 3, soup.y - 3, 7, 0, Math.PI * 2);
+                ctx.fillStyle = soup.oilColor;
+                ctx.fill();
+
+                // Pot Handles
+                ctx.fillStyle = "#3a1e0b";
+                ctx.fillRect(soup.x - 31, soup.y - 4, 6, 8);
+                ctx.fillRect(soup.x + 25, soup.y - 4, 6, 8);
+
+                // Label
+                ctx.fillStyle = "#ffb703";
                 ctx.font = "bold 11px Arial";
                 ctx.textAlign = "center";
-                ctx.fillText(soup.id, soup.x, soup.y + 35);
+                ctx.fillText(soup.name, soup.x, soup.y + 38);
             });
         }
 
         function drawTables() {
             tables.forEach(t => {
-                // Wooden Table Base
+                // Table Shadow
+                ctx.beginPath();
+                ctx.ellipse(t.x, t.y + 20, 42, 15, 0, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(0,0,0,0.5)";
+                ctx.fill();
+
+                // Wooden Table Top
                 ctx.beginPath();
                 ctx.arc(t.x, t.y, 38, 0, Math.PI * 2);
-                ctx.fillStyle = "#5c3317";
+                ctx.fillStyle = "#633722";
                 ctx.fill();
-                ctx.strokeStyle = "#3d210f";
+                ctx.strokeStyle = "#381e13";
                 ctx.lineWidth = 4;
                 ctx.stroke();
 
-                // Table Inner Ring
+                // Inner Wood Grain
                 ctx.beginPath();
                 ctx.arc(t.x, t.y, 28, 0, Math.PI * 2);
-                ctx.fillStyle = "#7a441e";
+                ctx.fillStyle = "#734028";
                 ctx.fill();
 
-                // Chairs (Top & Bottom)
-                drawChair(t.x, t.y - 48);
-                drawChair(t.x, t.y + 48);
+                // Table Number
+                ctx.fillStyle = "rgba(255,255,255,0.15)";
+                ctx.font = "bold 14px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText(t.id, t.x, t.y + 5);
 
-                // Draw Seated Customer
-                if (t.state !== 'empty' && t.customer) {
-                    drawCharacter(t.x, t.y - 20, t.customer.color, "customer");
+                // Customer Logic
+                if (t.status !== 'empty' && t.customer) {
+                    drawPerson(t.x, t.y - 20, t.customer.color, false);
 
-                    if (t.state === 'waiting_order') {
-                        drawOrderBubble(t.x + 20, t.y - 50, t.order);
-                    } else if (t.state === 'eating') {
-                        // Bowl on table
-                        let soupObj = soups.find(s => s.id === t.order);
-                        ctx.beginPath();
-                        ctx.arc(t.x, t.y, 12, 0, Math.PI * 2);
-                        ctx.fillStyle = soupObj ? soupObj.color : "#fff";
-                        ctx.fill();
-                        ctx.stroke();
-
-                        t.timer--;
-                        if (t.timer <= 0) {
-                            t.state = 'empty';
+                    if (t.status === 'waiting') {
+                        drawBubble(t.x + 25, t.y - 45, t.order);
+                    } else if (t.status === 'eating') {
+                        drawSoupBowl(t.x, t.y, t.order);
+                        t.eatTimer--;
+                        if (t.eatTimer <= 0) {
+                            t.status = 'empty';
                             t.customer = null;
                             t.order = null;
                         }
@@ -299,113 +334,108 @@
             });
         }
 
-        function drawChair(x, y) {
-            ctx.beginPath();
-            ctx.arc(x, y, 10, 0, Math.PI * 2);
-            ctx.fillStyle = "#8b4513";
-            ctx.fill();
-            ctx.stroke();
-        }
-
-        function drawQueue() {
-            waitingQueue.forEach((cust, index) => {
-                let qX = 40;
-                let qY = 160 + (index * 35);
-                drawCharacter(qX, qY, cust.color, "customer");
-            });
-        }
-
-        function drawCharacter(x, y, shirtColor, role) {
+        function drawPerson(x, y, color, isChef) {
             // Shadow
             ctx.beginPath();
-            ctx.ellipse(x, y + 15, 12, 5, 0, 0, Math.PI * 2);
+            ctx.ellipse(x, y + 18, 14, 6, 0, 0, Math.PI * 2);
             ctx.fillStyle = "rgba(0,0,0,0.4)";
             ctx.fill();
 
-            // Body
+            // Body / Torso
             ctx.beginPath();
-            ctx.arc(x, y + 5, 12, 0, Math.PI * 2);
-            ctx.fillStyle = shirtColor;
+            ctx.arc(x, y + 6, 13, 0, Math.PI * 2);
+            ctx.fillStyle = color;
             ctx.fill();
 
-            // Head / Face
+            // Head
             ctx.beginPath();
             ctx.arc(x, y - 8, 10, 0, Math.PI * 2);
-            ctx.fillStyle = "#ffdbac";
+            ctx.fillStyle = "#f1c27d";
             ctx.fill();
 
-            if (role === "chef") {
-                // Chef Hat
+            if (isChef) {
+                // Chef Mustache & Hat
+                ctx.fillStyle = "#3d2314";
+                ctx.fillRect(x - 5, y - 6, 10, 3);
+
+                // Big Chef Hat
                 ctx.fillStyle = "#ffffff";
-                ctx.fillRect(x - 8, y - 22, 16, 10);
+                ctx.fillRect(x - 9, y - 22, 18, 10);
                 ctx.beginPath();
-                ctx.arc(x, y - 22, 10, 0, Math.PI * 2);
+                ctx.arc(x, y - 22, 11, 0, Math.PI * 2);
                 ctx.fill();
-                // Apron
-                ctx.fillStyle = "#ffffff";
-                ctx.fillRect(x - 6, y + 2, 12, 10);
             }
         }
 
         function drawChef() {
-            // Smooth Movement
-            chef.x += (chef.targetX - chef.x) * 0.1;
-            chef.y += (chef.targetY - chef.y) * 0.1;
+            // Interpolated Smooth Movement
+            chef.x += (chef.targetX - chef.x) * chef.speed;
+            chef.y += (chef.targetY - chef.y) * chef.speed;
 
-            drawCharacter(chef.x, chef.y, "#d62828", "chef");
+            drawPerson(chef.x, chef.y, "#9e2a2b", true);
 
-            // Carrying Tray / Soup
+            // Carried Dish Tray
             if (chef.holding) {
-                let soupObj = soups.find(s => s.id === chef.holding);
+                ctx.fillStyle = "#a8a29e";
                 ctx.beginPath();
-                ctx.arc(chef.x + 14, chef.y, 8, 0, Math.PI * 2);
-                ctx.fillStyle = soupObj ? soupObj.color : "#fff";
+                ctx.arc(chef.x + 18, chef.y, 10, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.strokeStyle = "#000";
-                ctx.stroke();
+                drawSoupBowl(chef.x + 18, chef.y, chef.holding);
             }
         }
 
-        function drawOrderBubble(x, y, orderId) {
-            let soupObj = soups.find(s => s.id === orderId);
-
-            // Bubble Background
-            ctx.fillStyle = "#ffffff";
-            ctx.beginPath();
-            ctx.roundRect(x - 20, y - 15, 45, 28, 8);
-            ctx.fill();
-            ctx.strokeStyle = "#000";
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-
-            // Bowl Inside Bubble
-            ctx.beginPath();
-            ctx.arc(x, y, 7, 0, Math.PI * 2);
-            ctx.fillStyle = soupObj ? soupObj.color : "#ccc";
-            ctx.fill();
-            ctx.stroke();
-
-            // Soup Initial
-            ctx.fillStyle = "#000";
-            ctx.font = "bold 9px Arial";
-            ctx.textAlign = "center";
-            ctx.fillText(orderId.substring(0, 3), x + 12, y + 3);
+        function drawQueue() {
+            queue.forEach((cust, i) => {
+                drawPerson(37, 150 + (i * 55), cust.color, false);
+            });
         }
 
-        // --- MAIN GAME LOOP ---
-        function gameLoop() {
+        function drawBubble(x, y, orderId) {
+            ctx.fillStyle = "#ffffff";
+            ctx.beginPath();
+            ctx.roundRect(x - 18, y - 16, 42, 30, 8);
+            ctx.fill();
+            ctx.strokeStyle = "#ffb703";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            drawSoupBowl(x + 3, y - 1, orderId);
+        }
+
+        function drawSoupBowl(x, y, soupId) {
+            let soupObj = soups.find(s => s.id === soupId);
+            if (!soupObj) return;
+
+            // Ceramic Bowl
+            ctx.beginPath();
+            ctx.arc(x, y, 9, 0, Math.PI * 2);
+            ctx.fillStyle = "#ffffff";
+            ctx.fill();
+            ctx.strokeStyle = "#2b1810";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Soup Liquid inside bowl
+            ctx.beginPath();
+            ctx.arc(x, y, 7, 0, Math.PI * 2);
+            ctx.fillStyle = soupObj.mainColor;
+            ctx.fill();
+        }
+
+        // --- MAIN LOOP ---
+        function render() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            drawBackground();
+            drawFloor();
             drawPots();
             drawTables();
             drawQueue();
             drawChef();
 
-            requestAnimationFrame(gameLoop);
+            requestAnimationFrame(render);
         }
 
-        gameLoop();
+        render();
     </script>
 </body>
 </html>
