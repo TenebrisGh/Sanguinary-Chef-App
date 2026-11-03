@@ -3,395 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Soup House - Diner Management</title>
+    <title>The Soup House - Advanced Diner Sim</title>
     <style>
-        :root {
-            --bg-color: #1c130e;
-            --floor-color: #2c1d14;
-            --counter-color: #5c3a21;
-            --accent-gold: #ffb703;
-            --text-color: #f1faee;
-            --red-alert: #e63946;
-            --green-good: #2a9d8f;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
             margin: 0;
-            padding: 10px;
+            padding: 0;
+            background-color: #120b08;
+            color: #f1faee;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
             user-select: none;
         }
 
         header {
             text-align: center;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
 
         h1 {
-            color: var(--accent-gold);
+            color: #ffb703;
             margin: 0;
-            font-size: 22px;
+            font-size: 20px;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        .subtitle {
-            font-size: 12px;
-            color: #d3d3d3;
-        }
-
-        .stats-bar {
+        .hud {
             display: flex;
             justify-content: space-between;
-            width: 100%;
-            max-width: 480px;
-            background: #3a2518;
-            padding: 8px 15px;
-            border-radius: 8px;
-            border: 2px solid var(--accent-gold);
-            box-sizing: border-box;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        /* Game Layout Area */
-        #game-container {
-            width: 100%;
-            max-width: 480px;
-            height: 380px;
-            background-color: var(--floor-color);
-            border: 3px solid var(--counter-color);
-            border-radius: 12px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
-        }
-
-        /* Kitchen / Counter Zone */
-        .kitchen-counter {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 70px;
-            background-color: var(--counter-color);
-            border-bottom: 4px solid var(--accent-gold);
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            padding: 0 10px;
-            box-sizing: border-box;
-        }
-
-        .soup-pot {
-            background: #444;
-            border: 2px solid #888;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 10px;
-            text-align: center;
-            font-weight: bold;
-            box-shadow: inset 0 0 8px #000;
-            transition: transform 0.1s;
-        }
-
-        .soup-pot:active {
-            transform: scale(0.9);
-        }
-
-        .soup-pot.lentil { background: #e9c46a; color: #000; }
-        .soup-pot.iskembe { background: #f4f1de; color: #000; }
-        .soup-pot.beyran { background: #e63946; color: #fff; }
-        .soup-pot.ezogelin { background: #f4a261; color: #000; }
-
-        /* Dining Area Tables */
-        .dining-area {
-            position: absolute;
-            top: 90px;
-            width: 100%;
-            height: 280px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 15px;
-            padding: 10px 20px;
-            box-sizing: border-box;
-        }
-
-        .table-spot {
-            background: #4a3121;
-            border: 3px solid #6b472f;
-            border-radius: 50%;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-        }
-
-        .table-label {
-            font-size: 11px;
-            color: #ccc;
-            position: absolute;
-            bottom: 5px;
-        }
-
-        /* Customer & Order Bubble */
-        .customer {
-            font-size: 32px;
-            animation: bounce 1s infinite alternate;
-        }
-
-        @keyframes bounce {
-            from { transform: translateY(0); }
-            to { transform: translateY(-4px); }
-        }
-
-        .order-bubble {
-            position: absolute;
-            top: -25px;
-            background: white;
-            color: black;
-            padding: 3px 8px;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: bold;
-            border: 2px solid var(--accent-gold);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            white-space: nowrap;
-        }
-
-        /* Chef / Waiter Hands Indicator */
-        .holding-box {
-            margin-top: 10px;
-            width: 100%;
-            max-width: 480px;
-            background: #25170f;
-            border: 1px dashed var(--accent-gold);
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            box-sizing: border-box;
-        }
-
-        .holding-title {
-            font-size: 12px;
-            color: #aaa;
-            margin-bottom: 4px;
-        }
-
-        .holding-item {
-            font-size: 16px;
-            color: var(--accent-gold);
-            font-weight: bold;
-        }
-
-        #feedback {
-            margin-top: 8px;
-            height: 20px;
+            width: 400px;
+            background: #2c1d14;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 2px solid #ffb703;
+            margin-bottom: 8px;
             font-weight: bold;
             font-size: 14px;
+        }
+
+        canvas {
+            background: #231610;
+            border: 4px solid #5c3a21;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+            cursor: pointer;
+        }
+
+        .controls-hint {
+            margin-top: 8px;
+            font-size: 11px;
+            color: #d3d3d3;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>The Soup House</h1>
-        <div class="subtitle">Traditional Turkish Soup Diner Management</div>
+        <h1>The Soup House (Advanced)</h1>
     </header>
 
-    <div class="stats-bar">
-        <span>Score: <span id="score" style="color: var(--accent-gold);">0</span></span>
-        <span>Time: <span id="timer" style="color: #ff6b6b;">60s</span></span>
+    <div class="hud">
+        <span>Score: <span id="score" style="color: #ffb703;">0</span></span>
+        <span>Time: <span id="timer" style="color: #e63946;">60s</span></span>
+        <span>Carrying: <span id="carrying" style="color: #2a9d8f;">None</span></span>
     </div>
 
-    <div id="game-container">
-        <!-- Kitchen Pots -->
-        <div class="kitchen-counter">
-            <div class="soup-pot lentil" onclick="cookSoup('Lentil Soup')">
-                🥣<span>Lentil</span>
-            </div>
-            <div class="soup-pot iskembe" onclick="cookSoup('Iskembe Soup')">
-                🥣<span>Iskembe</span>
-            </div>
-            <div class="soup-pot beyran" onclick="cookSoup('Beyran Soup')">
-                🥣<span>Beyran</span>
-            </div>
-            <div class="soup-pot ezogelin" onclick="cookSoup('Ezogelin')">
-                🥣<span>Ezogelin</span>
-            </div>
-        </div>
+    <canvas id="gameCanvas" width="400" height="450"></canvas>
 
-        <!-- Dining Tables -->
-        <div class="dining-area">
-            <div class="table-spot" id="table-0" onclick="serveTable(0)">
-                <span class="table-label">Table 1</span>
-            </div>
-            <div class="table-spot" id="table-1" onclick="serveTable(1)">
-                <span class="table-label">Table 2</span>
-            </div>
-            <div class="table-spot" id="table-2" onclick="serveTable(2)">
-                <span class="table-label">Table 3</span>
-            </div>
-            <div class="table-spot" id="table-3" onclick="serveTable(3)">
-                <span class="table-label">Table 4</span>
-            </div>
-        </div>
+    <div class="controls-hint">
+        1. Click Soup Pots on top to cook.<br>
+        2. Click Waiting Customers to take orders / serve.
     </div>
-
-    <div class="holding-box">
-        <div class="holding-title">Chef Carrying:</div>
-        <div class="holding-item" id="carrying-display">Empty Hands</div>
-    </div>
-
-    <div id="feedback"></div>
 
     <script>
-        const soupTypes = ["Lentil Soup", "Iskembe Soup", "Beyran Soup", "Ezogelin"];
-        const customerEmojis = ["🧔🏻‍♂️", "👨🏽", "🧕🏼", "👵🏻", "👨🏻‍🍳"];
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
 
-        let carriedSoup = null;
         let score = 0;
         let timeLeft = 60;
-        let gameTimer = null;
-        let customerSpawner = null;
+        let carriedSoup = null; // 'Lentil', 'İşkembe', 'Beyran'
 
-        // Table states: null or { customer: emoji, order: soupType }
-        let tables = [null, null, null, null];
+        // Counter (Kitchen) Pots Areas
+        const pots = [
+            { name: 'Lentil', x: 50, y: 30, color: '#e9c46a' },
+            { name: 'İşkembe', x: 150, y: 30, color: '#f4f1de' },
+            { name: 'Beyran', x: 250, y: 30, color: '#e63946' },
+            { name: 'Ezogelin', x: 350, y: 30, color: '#f4a261' }
+        ];
 
-        function startGame() {
+        // Restaurant Tables (Penguin Diner Style Positions)
+        const tables = [
+            { id: 0, x: 80, y: 200, customer: null, order: null, status: 'empty' }, // empty, waiting, eating, dirty
+            { id: 1, x: 320, y: 200, customer: null, order: null, status: 'empty' },
+            { id: 2, x: 80, y: 360, customer: null, order: null, status: 'empty' },
+            { id: 3, x: 320, y: 360, customer: null, order: null, status: 'empty' }
+        ];
+
+        const soupNames = ['Lentil', 'İşkembe', 'Beyran', 'Ezogelin'];
+        const customerEmojis = ['🧔🏻‍♂️', '🧕🏼', '👵🏻', '👨🏽'];
+
+        // Game Timer
+        setInterval(() => {
+            if (timeLeft > 0) {
+                timeLeft--;
+                document.getElementById("timer").innerText = timeLeft + "s";
+                if (timeLeft === 0) {
+                    alert("Shift Over! Final Score: " + score);
+                    resetGame();
+                }
+            }
+        }, 1000);
+
+        // Customer Spawner Loop
+        setInterval(() => {
+            let emptyTables = tables.filter(t => t.status === 'empty');
+            if (emptyTables.length > 0) {
+                let randomTable = emptyTables[Math.floor(Math.random() * emptyTables.length)];
+                randomTable.status = 'waiting';
+                randomTable.customer = customerEmojis[Math.floor(Math.random() * customerEmojis.length)];
+                randomTable.order = soupNames[Math.floor(Math.random() * soupNames.length)];
+            }
+        }, 3000);
+
+        function resetGame() {
             score = 0;
             timeLeft = 60;
             carriedSoup = null;
-            tables = [null, null, null, null];
-            updateCarryingUI();
-            updateScoreUI();
-            renderTables();
-
-            clearInterval(gameTimer);
-            clearInterval(customerSpawner);
-
-            gameTimer = setInterval(() => {
-                timeLeft--;
-                document.getElementById("timer").innerText = timeLeft + "s";
-                if (timeLeft <= 0) {
-                    endGame();
-                }
-            }, 1000);
-
-            // Spawn customer every 2.5 seconds
-            customerSpawner = setInterval(spawnCustomer, 2500);
-            spawnCustomer(); // Immediate first spawn
+            tables.forEach(t => { t.status = 'empty'; t.customer = null; t.order = null; });
+            updateHUD();
         }
 
-        function spawnCustomer() {
-            let emptyIndices = [];
-            tables.forEach((t, idx) => {
-                if (t === null) emptyIndices.push(idx);
-            });
+        // Canvas Click Mechanics
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
 
-            if (emptyIndices.length > 0) {
-                let randomTable = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
-                let randomCustomer = customerEmojis[Math.floor(Math.random() * customerEmojis.length)];
-                let randomOrder = soupTypes[Math.floor(Math.random() * soupTypes.length)];
-
-                tables[randomTable] = {
-                    customer: randomCustomer,
-                    order: randomOrder
-                };
-                renderTables();
-            }
-        }
-
-        function cookSoup(soupName) {
-            carriedSoup = soupName;
-            updateCarryingUI();
-            showFeedback("Picked up " + soupName, "#ffb703");
-        }
-
-        function serveTable(tableIndex) {
-            let table = tables[tableIndex];
-
-            if (!table) {
-                showFeedback("Table is empty!", "#aaa");
-                return;
-            }
-
-            if (!carriedSoup) {
-                showFeedback("Pick a soup from counter first!", "#ff6b6b");
-                return;
-            }
-
-            if (carriedSoup === table.order) {
-                score += 10;
-                showFeedback("+10 Correct Soup Served!", "#2a9d8f");
-                tables[tableIndex] = null; // Customer leaves satisfied
-                carriedSoup = null;
-            } else {
-                score = Math.max(0, score - 5);
-                showFeedback("-5 Wrong Order Served!", "#e63946");
-                carriedSoup = null;
-            }
-
-            updateScoreUI();
-            updateCarryingUI();
-            renderTables();
-        }
-
-        function renderTables() {
-            tables.forEach((t, idx) => {
-                let el = document.getElementById("table-" + idx);
-                if (t) {
-                    el.innerHTML = `
-                        <div class="order-bubble">Want: ${t.order}</div>
-                        <div class="customer">${t.customer}</div>
-                        <span class="table-label">Table ${idx + 1}</span>
-                    `;
-                } else {
-                    el.innerHTML = `<span class="table-label">Table ${idx + 1} (Empty)</span>`;
+            // Check Pots Click (Cooking)
+            pots.forEach(pot => {
+                let dist = Math.hypot(mouseX - pot.x, mouseY - pot.y);
+                if (dist < 30) {
+                    carriedSoup = pot.name;
+                    updateHUD();
                 }
             });
-        }
 
-        function updateCarryingUI() {
-            let display = document.getElementById("carrying-display");
-            display.innerText = carriedSoup ? "🥣 " + carriedSoup : "Empty Hands";
-        }
+            // Check Tables Click (Serving / Interacting)
+            tables.forEach(table => {
+                let dist = Math.hypot(mouseX - table.x, mouseY - table.y);
+                if (dist < 40) {
+                    if (table.status === 'waiting') {
+                        if (carriedSoup === table.order) {
+                            score += 10;
+                            carriedSoup = null;
+                            table.status = 'eating';
+                            // Customer finishes eating after 3 seconds and leaves
+                            setTimeout(() => {
+                                table.status = 'empty';
+                                table.customer = null;
+                                table.order = null;
+                            }, 3000);
+                        } else if (carriedSoup !== null) {
+                            score = Math.max(0, score - 5); // Wrong order penalty
+                            carriedSoup = null;
+                        }
+                    }
+                    updateHUD();
+                }
+            });
+        });
 
-        function updateScoreUI() {
+        function updateHUD() {
             document.getElementById("score").innerText = score;
+            document.getElementById("carrying").innerText = carriedSoup ? carriedSoup : "None";
         }
 
-        function showFeedback(msg, color) {
-            let fb = document.getElementById("feedback");
-            fb.innerText = msg;
-            fb.style.color = color;
-            setTimeout(() => {
-                if (fb.innerText === msg) fb.innerText = "";
-            }, 1500);
+        // Main Render Loop
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Kitchen Counter Background
+            ctx.fillStyle = "#3a2518";
+            ctx.fillRect(0, 0, canvas.width, 70);
+            ctx.strokeStyle = "#ffb703";
+            ctx.lineWidth = 3;
+            ctx.strokeRect(0, 0, canvas.width, 70);
+
+            // Draw Pots
+            pots.forEach(pot => {
+                ctx.beginPath();
+                ctx.arc(pot.x, pot.y, 22, 0, Math.PI * 2);
+                ctx.fillStyle = pot.color;
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = "#000";
+                ctx.stroke();
+                
+                ctx.fillStyle = "#000";
+                ctx.font = "bold 10px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText(pot.name, pot.x, pot.y + 4);
+            });
+
+            // Draw Tables & Customers
+            tables.forEach(table => {
+                // Table Base
+                ctx.beginPath();
+                ctx.arc(table.x, table.y, 35, 0, Math.PI * 2);
+                ctx.fillStyle = "#4a3121";
+                ctx.fill();
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = "#6b472f";
+                ctx.stroke();
+
+                // Table Label
+                ctx.fillStyle = "#aaa";
+                ctx.font = "10px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText(`Table ${table.id + 1}`, table.x, table.y + 25);
+
+                // Customer & States
+                if (table.status === 'waiting') {
+                    // Draw Customer Emoji
+                    ctx.font = "28px Arial";
+                    ctx.fillText(table.customer, table.x, table.y - 2);
+
+                    // Draw Order Bubble
+                    ctx.fillStyle = "white";
+                    ctx.fillRect(table.x - 30, table.y - 55, 60, 20);
+                    ctx.strokeStyle = "#ffb703";
+                    ctx.strokeRect(table.x - 30, table.y - 55, 60, 20);
+
+                    ctx.fillStyle = "black";
+                    ctx.font = "bold 9px Arial";
+                    ctx.fillText(table.order, table.x, table.y - 41);
+                } else if (table.status === 'eating') {
+                    ctx.font = "28px Arial";
+                    ctx.fillText("😋", table.x, table.y - 2);
+
+                    ctx.fillStyle = "#2a9d8f";
+                    ctx.font = "bold 10px Arial";
+                    ctx.fillText("Enjoying!", table.x, table.y - 40);
+                }
+            });
+
+            requestAnimationFrame(draw);
         }
 
-        function endGame() {
-            clearInterval(gameTimer);
-            clearInterval(customerSpawner);
-            alert("Shift Ended! Total Soup House Revenue/Score: " + score);
-            startGame();
-        }
-
-        window.onload = startGame;
+        draw();
     </script>
 </body>
 </html>
